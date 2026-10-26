@@ -3,20 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>性平與人權普特融合互動教學系統 - 身體界限與友善天平</title>
+  <title>性平與人權普特融合互動教學系統 - 我的身體小星球與友善天平</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Tone.js for auditory feedback -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Canvas Confetti for rewards -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <!-- FontAwesome Icons for visual AAC & UI cues -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Noto Sans TC & Fredoka -->
+  <!-- Google Fonts: Noto Sans TC & Fredoka & Comic Neue -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -34,6 +37,15 @@
           fontFamily: {
             sans: ['"Noto Sans TC"', 'sans-serif'],
             kids: ['Fredoka', '"Noto Sans TC"', 'sans-serif']
+          },
+          boxShadow: {
+            'btn-3d': '0 4px 0 #cbd5e1',
+            'btn-3d-active': '0 1px 0 #cbd5e1',
+            'btn-indigo-3d': '0 4px 0 #4338ca',
+            'btn-emerald-3d': '0 4px 0 #047857',
+            'btn-rose-3d': '0 4px 0 #be123c',
+            'btn-amber-3d': '0 4px 0 #b45309',
+            'card-float': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03)'
           }
         }
       }
@@ -45,13 +57,24 @@
       font-family: 'Noto Sans TC', sans-serif;
       user-select: none;
       font-size: 16px;
+      transition: background-color 0.3s, color 0.3s, font-size 0.2s;
     }
+    
+    /* 3D Tactile Buttons */
+    .btn-tactile {
+      transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-tactile:active {
+      transform: translateY(3px);
+    }
+    
+    /* Pulse and Glowing animations */
     .pulse-ring {
       animation: pulseAnimation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     @keyframes pulseAnimation {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(1.04); }
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.05); }
     }
     .wiggle {
       animation: wiggle 0.6s ease-in-out infinite alternate;
@@ -60,18 +83,79 @@
       from { transform: rotate(-3deg); }
       to { transform: rotate(3deg); }
     }
-    /* Accessible focus indicator */
-    button:focus-visible, [tabindex="0"]:focus-visible {
-      outline: 4px solid #6366f1;
-      outline-offset: 2px;
+    .float-slow {
+      animation: floatSlow 4s ease-in-out infinite alternate;
     }
+    @keyframes floatSlow {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-6px); }
+    }
+    .sway-tag {
+      transform-origin: top center;
+      animation: tagSway 3.2s ease-in-out infinite alternate;
+    }
+    @keyframes tagSway {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+    
+    /* Accessible focus indicator */
+    button:focus-visible, [tabindex="0"]:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 4px solid #6366f1 !important;
+      outline-offset: 3px !important;
+    }
+
+    /* High Contrast Mode for Visually Impaired */
+    body.high-contrast {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+    }
+    body.high-contrast .bg-white {
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+      border-color: #475569 !important;
+    }
+    body.high-contrast .bg-slate-50, 
+    body.high-contrast .bg-slate-100 {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #475569 !important;
+    }
+    body.high-contrast text,
+    body.high-contrast h1,
+    body.high-contrast h2,
+    body.high-contrast h3,
+    body.high-contrast h4,
+    body.high-contrast p,
+    body.high-contrast span {
+      color: #ffffff !important;
+    }
+    body.high-contrast .text-slate-500,
+    body.high-contrast .text-slate-600,
+    body.high-contrast .text-slate-700 {
+      color: #cbd5e1 !important;
+    }
+
+    /* Classroom Big Screen Mode */
+    body.classroom-mode {
+      font-size: 19px !important;
+    }
+    body.classroom-mode header {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+    body.classroom-mode button {
+      min-height: 48px;
+    }
+
     /* Custom scrollbars */
     ::-webkit-scrollbar {
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
     }
     ::-webkit-scrollbar-track {
       background: #f1f5f9;
+      border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
@@ -80,25 +164,28 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+
     /* Dedicated TTS speaker button styling */
     .tts-speaker-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2rem;
-      height: 2rem;
+      width: 2.1rem;
+      height: 2.1rem;
       border-radius: 9999px;
       background-color: #ede9fe;
       color: #6d28d9;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
       border: 1px solid #ddd6fe;
       cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     .tts-speaker-btn:hover {
       background-color: #ddd6fe;
       color: #5b21b6;
-      transform: scale(1.12);
+      transform: scale(1.15) rotate(-5deg);
+      box-shadow: 0 4px 6px -1px rgba(109, 40, 217, 0.2);
     }
     .tts-speaker-btn:active {
       transform: scale(0.95);
@@ -130,31 +217,63 @@
       background-color: #fecdd3;
       color: #9f1239;
     }
+
+    /* Printable Certificate Styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-modal, #certificate-modal * {
+        visibility: visible;
+      }
+      #certificate-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: white !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased text-base">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased text-base selection:bg-indigo-500 selection:text-white">
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
-      <!-- Title & Emblem -->
+  <!-- TOP HEADER & UNIVERSAL TOOLBAR -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm transition-colors">
+    <div class="max-w-7xl mx-auto px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand Title & Emblem -->
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-400 to-indigo-500 flex items-center justify-center text-white shadow-md shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-400 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 shrink-0 transform hover:scale-105 transition">
           <i class="fa-solid fa-hands-holding-child text-2xl"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+            <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight font-kids">
               我的身體小星球 & 友善天平
             </h1>
-            <span class="text-xs md:text-sm bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-black">普特融合教學</span>
-            <button onclick="speakText('我的身體小星球與友善天平，普特融合教學系統。性別平等教育、人權教育與特殊需求領域綱要融入。')" class="tts-speaker-btn w-7 h-7 text-xs ml-1" title="朗讀標題"><i class="fa-solid fa-volume-high"></i></button>
+            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-black flex items-center gap-1 shadow-xs">
+              <i class="fa-solid fa-award text-amber-500"></i> 普特融合特教教材
+            </span>
+            <button onclick="speakText('性平與人權普特融合互動教學系統：我的身體小星球與友善天平。融入生活管理、社會技巧、溝通訓練與學習策略領域綱要。')" class="tts-speaker-btn w-7 h-7 text-xs ml-0.5" title="朗讀標題"><i class="fa-solid fa-volume-high"></i></button>
           </div>
-          <p class="text-xs md:text-sm text-slate-500 font-semibold hidden sm:block">性別平等教育 × 人權教育 × 特殊需求領域綱要融入</p>
+          <p class="text-xs md:text-sm text-slate-500 font-semibold hidden sm:flex items-center gap-2">
+            <span><i class="fa-solid fa-venus-mars text-rose-500"></i> 性平教育</span>
+            <span>•</span>
+            <span><i class="fa-solid fa-scale-balanced text-amber-500"></i> 人權教育</span>
+            <span>•</span>
+            <span><i class="fa-solid fa-universal-access text-teal-600"></i> UDL 通用設計與 AAC 整合</span>
+          </p>
         </div>
       </div>
 
       <!-- Module Switcher Tabs -->
-      <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 text-sm md:text-base font-black">
+      <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 text-sm md:text-base font-black shadow-inner">
         <button id="tab-btn-plan1" onclick="switchMainTab('plan1')" class="px-3.5 md:px-5 py-2.5 rounded-xl transition-all duration-200 bg-white shadow-sm text-indigo-700 flex items-center gap-2">
           <i class="fa-solid fa-traffic-light text-rose-500 text-base"></i>
           <span>方案一：低年級·界限星球</span>
@@ -166,25 +285,43 @@
         <button id="tab-btn-doc" onclick="switchMainTab('doc')" class="px-3 md:px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:text-indigo-600 flex items-center gap-2">
           <i class="fa-solid fa-book-bookmark text-teal-600 text-base"></i>
           <span class="hidden md:inline">特需綱要與亮點對照表</span>
+          <span class="md:hidden">綱要亮點</span>
         </button>
       </div>
 
-      <!-- Universal Accessibility Controls -->
-      <div class="flex items-center gap-2.5">
-        <button id="audio-toggle-btn" onclick="toggleAudioSpeech()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm flex items-center gap-2 border border-slate-300 shadow-sm transition" title="開關音效與語音輔助 (UDL)">
+      <!-- Quick Accessibility Toolbar -->
+      <div class="flex items-center gap-2">
+        <!-- Audio Speech Toggle -->
+        <button id="audio-toggle-btn" onclick="toggleAudioSpeech()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm flex items-center gap-1.5 border border-slate-300 shadow-sm transition" title="開關音效與語音輔助 (UDL)">
           <i class="fa-solid fa-volume-high text-indigo-600 text-base" id="audio-icon"></i>
-          <span class="hidden sm:inline">語音朗讀: <span id="audio-status-text">開</span></span>
+          <span class="hidden sm:inline">朗讀: <span id="audio-status-text">開</span></span>
         </button>
-        <button onclick="showSettingsModal()" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-sm flex items-center gap-1.5 border border-amber-300 transition shadow-xs" title="自訂字體大小、朗讀速度與音色">
+
+        <!-- Classroom Smartboard Mode -->
+        <button onclick="toggleSmartboardMode()" id="smartboard-btn" class="px-3 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-black text-sm flex items-center gap-1.5 border border-teal-300 shadow-xs transition" title="電子白板與大螢幕觸控模式">
+          <i class="fa-solid fa-display text-base text-teal-600"></i>
+          <span class="hidden lg:inline">教室大螢幕</span>
+        </button>
+
+        <!-- High Contrast Mode -->
+        <button onclick="toggleHighContrast()" id="contrast-btn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-amber-300 font-black text-sm flex items-center gap-1.5 shadow-sm transition" title="高對比無視障模式">
+          <i class="fa-solid fa-circle-half-stroke text-base"></i>
+          <span class="hidden xl:inline">高對比</span>
+        </button>
+
+        <!-- Settings Modal -->
+        <button onclick="showSettingsModal()" class="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-black text-sm flex items-center gap-1.5 border border-amber-300 transition shadow-xs" title="自訂字體大小、朗讀速度與音色">
           <i class="fa-solid fa-sliders text-base text-amber-600"></i>
-          <span class="hidden md:inline">字體與語音設定</span>
-          <span class="md:hidden">設定</span>
+          <span class="hidden md:inline">設定</span>
         </button>
-        <button onclick="showQuickGuideModal()" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-black text-sm flex items-center gap-1.5 border border-indigo-200 transition">
+
+        <!-- Guide Modal -->
+        <button onclick="showQuickGuideModal()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-black text-sm flex items-center gap-1.5 border border-indigo-200 transition">
           <i class="fa-solid fa-circle-question text-base"></i>
-          <span>使用指南</span>
+          <span class="hidden sm:inline">指南</span>
         </button>
       </div>
+
     </div>
   </header>
 
@@ -194,12 +331,16 @@
     <!-- MODULE 1: 方案一（基礎版）低年級【身體紅綠燈與界限星球】                     -->
     <!-- ========================================================================= -->
     <section id="module-plan1" class="space-y-6">
+      
       <!-- Section Intro Banner -->
-      <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-emerald-50 border-2 border-rose-200/80 rounded-3xl p-5 sm:p-6 relative overflow-hidden shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-emerald-50 border-2 border-rose-200/90 rounded-3xl p-5 sm:p-6 relative overflow-hidden shadow-sm">
+        <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none text-9xl text-indigo-500">
+          <i class="fa-solid fa-planet-ringed"></i>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-rose-700 bg-rose-100/90 px-3.5 py-1.5 rounded-full">
-              <i class="fa-solid fa-shield-cat text-sm"></i> 適用國小 1-2 年級 / 普特融合
+            <div class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-rose-700 bg-rose-100 px-3.5 py-1.5 rounded-full shadow-xs">
+              <i class="fa-solid fa-shield-cat text-sm"></i> 適用國小 1-2 年級 / 特教資源班與普通班普特融合
             </div>
             <div class="flex items-center gap-3">
               <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-kids">
@@ -207,27 +348,27 @@
               </h2>
               <button onclick="speakText('我的身體小星球，身體界限與觸碰安全探索盒。每一位小朋友的身體，都是宇宙中最珍貴的小星球！認識紅、黃、綠燈身體信號，掌握先問問、才可以的尊重禮儀與自主權。')" class="tts-speaker-btn tts-speaker-btn-rose" title="朗讀方案一說明"><i class="fa-solid fa-volume-high"></i></button>
             </div>
-            <p class="text-base sm:text-lg text-slate-700 leading-relaxed max-w-3xl">
+            <p class="text-base sm:text-lg text-slate-700 leading-relaxed max-w-3xl font-medium">
               每一位小朋友的身體，都是宇宙中最珍貴的小星球！認識紅、黃、綠燈身體信號，掌握「先問問、才可以」的尊重禮儀與自主權。
             </p>
           </div>
-          <!-- Quick Stat Badge -->
+          <!-- Quick Stat Badges -->
           <div class="flex gap-2.5 text-center text-sm font-black self-start md:self-auto shrink-0">
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-rose-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-rose-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-rose-600 text-lg font-black">
                 <i class="fa-solid fa-circle-stop"></i> 紅燈
                 <button onclick="speakText('紅燈：絕對保護，泳裝覆蓋處，非經同意不可觸碰。')" class="w-5 h-5 rounded-full bg-rose-100 text-rose-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <div class="text-slate-600 text-xs font-bold mt-0.5">絕對保護·泳裝處</div>
             </div>
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-amber-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-amber-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-amber-600 text-lg font-black">
                 <i class="fa-solid fa-handshake"></i> 黃燈
                 <button onclick="speakText('黃燈：先問同意，手肘與肩膀，好朋友互動需先詢問。')" class="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <div class="text-slate-600 text-xs font-bold mt-0.5">先問同意·手肘肩</div>
             </div>
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-emerald-600 text-lg font-black">
                 <i class="fa-solid fa-hand"></i> 綠燈
                 <button onclick="speakText('綠燈：禮貌打招呼，保持安全距離，揮手致意。')" class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
@@ -238,14 +379,15 @@
         </div>
       </div>
 
+      <!-- Sub-Tool Navigation -->
       <div class="flex flex-wrap gap-2.5 border-b border-slate-200 pb-3.5">
-        <button onclick="setPlan1Tool('doll')" id="btn-p1-doll" class="p1-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200">
+        <button onclick="setPlan1Tool('doll')" id="btn-p1-doll" class="p1-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200 btn-tactile">
           <i class="fa-solid fa-child-reaching text-lg"></i> 1. 磁吸布偶衣著與信號貼操作板
         </button>
-        <button onclick="setPlan1Tool('circles')" id="btn-p1-circles" class="p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+        <button onclick="setPlan1Tool('circles')" id="btn-p1-circles" class="p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile">
           <i class="fa-solid fa-circle-dot text-amber-500 text-lg"></i> 2. 多感官安全同心圓互動地墊
         </button>
-        <button onclick="setPlan1Tool('aac')" id="btn-p1-aac" class="p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+        <button onclick="setPlan1Tool('aac')" id="btn-p1-aac" class="p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile">
           <i class="fa-solid fa-bullhorn text-rose-500 text-lg"></i> 3. 「先問問，才可以」AAC雙面語音牌
         </button>
       </div>
@@ -254,105 +396,224 @@
       <div id="p1-tool-doll" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Left: Doll Canvas & Parts -->
-        <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 flex flex-col items-center relative">
-          <!-- Control bar for Doll -->
-          <div class="w-full flex items-center justify-between pb-3.5 mb-2.5 border-b border-slate-100">
-            <div class="flex items-center gap-2.5">
-              <span class="text-sm font-black text-slate-600 flex items-center gap-1.5">
-                <i class="fa-solid fa-child text-indigo-500 text-base"></i> 操作布偶：
+        <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 shadow-card-float border border-slate-200 flex flex-col items-center relative">
+          
+          <!-- Character Switcher & Clothing Bar -->
+          <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-3 pb-3.5 mb-2.5 border-b border-slate-100">
+            <!-- Character switcher -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-xs sm:text-sm font-black text-slate-600 flex items-center gap-1">
+                <i class="fa-solid fa-users text-indigo-500"></i> 同伴：
               </span>
-              <span class="px-3.5 py-1.5 rounded-xl text-sm font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
-                星球小探索家 (身體小夥伴)
-              </span>
-              <button onclick="speakText('操作布偶：星球小探索家。每個人都擁有屬於自己的身體小星球，不分角色，界限都值得被尊重。')" class="tts-speaker-btn w-7 h-7 text-xs" title="朗讀布偶說明"><i class="fa-solid fa-volume-high"></i></button>
+              <button onclick="switchCharacter('star')" id="char-btn-star" class="char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-indigo-600 text-white shadow-xs" title="小星：溫暖探索家">🌟 小星</button>
+              <button onclick="switchCharacter('sunny')" id="char-btn-sunny" class="char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200" title="小晴：可愛雙辮">🌸 小晴</button>
+              <button onclick="switchCharacter('ann')" id="char-btn-ann" class="char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200" title="小安：清爽短髮">🌿 小安</button>
+              <button onclick="switchCharacter('yu')" id="char-btn-yu" class="char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200" title="小宇：輪椅好夥伴 (特教融合)">♿ 小宇</button>
             </div>
+            
             <!-- Swimsuit toggle -->
-            <button onclick="toggleSwimsuit()" class="px-4 py-2 rounded-xl text-sm font-black bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 transition flex items-center gap-2 shadow-xs">
+            <button onclick="toggleSwimsuit()" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-rose-100 text-rose-800 hover:bg-rose-200 border border-rose-300 transition flex items-center gap-1.5 shadow-xs btn-tactile">
               <i class="fa-solid fa-shirt"></i>
               <span id="swimsuit-btn-text">穿上泳衣探索隱私處</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-center gap-2 mb-3">
-            <p class="text-sm font-bold text-slate-500 text-center">
-              <i class="fa-solid fa-circle-info text-indigo-500"></i> 請先挑選右側「信號磁貼」，再點選布偶身上部位貼上；或直接點擊部位聽語音安全界限！
-            </p>
-            <button onclick="speakText('操作提示：請先挑選右側信號磁貼，再點選布偶身上部位貼上；或直接點擊部位聽語音安全界限！')" class="tts-speaker-btn w-6 h-6 text-xs" title="朗讀操作說明"><i class="fa-solid fa-volume-high"></i></button>
+          <!-- Instructions & Progress Indicator -->
+          <div class="w-full flex items-center justify-between gap-2 mb-3 bg-indigo-50/80 px-4 py-2 rounded-2xl border border-indigo-100 text-xs sm:text-sm">
+            <span class="text-slate-700 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-info text-indigo-600"></i> 先挑選右側信號磁貼，點選布偶部位貼上！
+            </span>
+            <div class="flex items-center gap-1 font-black text-indigo-700 shrink-0">
+              <span>探索進度:</span>
+              <span id="exploration-score" class="bg-indigo-600 text-white px-2 py-0.5 rounded-lg text-xs">0/5 ⭐</span>
+            </div>
           </div>
 
           <!-- Doll Interactive SVG Representation -->
-          <div class="relative w-80 sm:w-96 h-[440px] sm:h-[460px] bg-slate-50 rounded-3xl border-2 border-dashed border-indigo-200 flex items-center justify-center p-3 shadow-inner">
+          <div class="relative w-full max-w-sm h-[460px] bg-gradient-to-b from-indigo-50/40 via-white to-slate-50 rounded-3xl border-2 border-dashed border-indigo-200 flex items-center justify-center p-3 shadow-inner overflow-hidden">
             
-            <svg id="doll-svg" viewBox="0 0 300 420" class="w-full h-full max-h-full drop-shadow">
-              <!-- Background Silhouette/Aura -->
-              <ellipse cx="150" cy="400" rx="90" ry="12" fill="#cbd5e1" opacity="0.4" />
-              
-              <!-- Body Limbs -->
-              <rect id="leg-left" x="110" y="240" width="30" height="130" rx="15" fill="#fcd34d" class="cursor-pointer hover:opacity-80 transition" onclick="clickDollPart('legs', '雙腿/膝蓋')" />
-              <rect id="leg-right" x="160" y="240" width="30" height="130" rx="15" fill="#fcd34d" class="cursor-pointer hover:opacity-80 transition" onclick="clickDollPart('legs', '雙腿/膝蓋')" />
-              <!-- Feet -->
-              <ellipse cx="125" cy="375" rx="20" ry="10" fill="#f59e0b" />
-              <ellipse cx="175" cy="375" rx="20" ry="10" fill="#f59e0b" />
+            <svg id="doll-svg" viewBox="0 0 340 440" class="w-full h-full max-h-full drop-shadow">
+              <defs>
+                <radialGradient id="planetAura" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#818cf8" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#c7d2fe" stop-opacity="0" />
+                </radialGradient>
+                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.15" />
+                </filter>
+              </defs>
 
-              <!-- Arms -->
-              <rect x="52" y="145" width="26" height="120" rx="13" fill="#fcd34d" transform="rotate(16 52 145)" class="cursor-pointer hover:opacity-80 transition" onclick="clickDollPart('shoulder-left', '手臂/手肘')" />
-              <rect x="222" y="145" width="26" height="120" rx="13" fill="#fcd34d" transform="rotate(-16 222 145)" class="cursor-pointer hover:opacity-80 transition" onclick="clickDollPart('shoulder-right', '手臂/手肘')" />
+              <!-- Cosmic Halo Aura -->
+              <circle cx="170" cy="220" r="160" fill="url(#planetAura)" />
 
-              <!-- Hands (Waving) -->
-              <circle cx="48" cy="265" r="18" fill="#fde68a" class="cursor-pointer hover:stroke-4 hover:stroke-emerald-400 transition" onclick="clickDollPart('hand-left', '手掌 (打招呼)')" />
-              <circle cx="252" cy="265" r="18" fill="#fde68a" class="cursor-pointer hover:stroke-4 hover:stroke-emerald-400 transition" onclick="clickDollPart('hand-right', '手掌 (打招呼)')" />
+              <!-- Ground shadow -->
+              <ellipse cx="170" cy="415" rx="90" ry="14" fill="#cbd5e1" opacity="0.6" />
 
-              <!-- Torso Body -->
-              <rect x="95" y="130" width="110" height="130" rx="25" fill="#fef08a" />
-
-              <!-- Head & Neck -->
-              <rect x="135" y="105" width="30" height="30" fill="#fde68a" />
-              <circle cx="150" cy="80" r="46" fill="#fde68a" class="cursor-pointer hover:stroke-2 hover:stroke-indigo-400 transition" onclick="clickDollPart('head', '頭部/臉頰')" />
-              
-              <!-- Hair (Gender-neutral rounded style) -->
-              <path id="doll-hair" d="M 105,75 C 105,35 195,35 195,75 C 190,55 160,50 150,55 C 140,50 110,55 105,75 Z" fill="#475569" />
-              
-              <!-- Face Features -->
-              <circle cx="135" cy="78" r="4.5" fill="#1e293b" />
-              <circle cx="165" cy="78" r="4.5" fill="#1e293b" />
-              <path d="M 138,98 Q 150,110 162,98" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round" />
-              <!-- Cheeks -->
-              <circle cx="126" cy="88" r="6" fill="#f87171" opacity="0.5" />
-              <circle cx="174" cy="88" r="6" fill="#f87171" opacity="0.5" />
-
-              <!-- Swimsuit Layers -->
-              <g id="swimsuit-group" class="transition-opacity duration-300">
-                <path id="swimsuit-top" d="M 100,140 L 200,140 L 195,190 L 105,190 Z" fill="#fb7185" rx="8" class="cursor-pointer hover:opacity-90" onclick="clickDollPart('chest', '胸部 (泳衣覆蓋處)')" />
-                <path d="M 115,140 L 125,120 M 185,140 L 175,120" stroke="#f43f5e" stroke-width="6" stroke-linecap="round" />
-                <path id="swimsuit-bottom" d="M 98,215 L 202,215 L 185,265 L 115,265 Z" fill="#fb7185" class="cursor-pointer hover:opacity-90" onclick="clickDollPart('groin', '私密部位 (泳褲覆蓋處)')" />
+              <!-- Wheelchair Layer (Active only for character 'yu') -->
+              <g id="wheelchair-group" class="hidden transition-opacity duration-300">
+                <!-- Back wheel outer ring -->
+                <circle cx="170" cy="340" r="62" stroke="#475569" stroke-width="8" fill="none" />
+                <circle cx="170" cy="340" r="12" fill="#334155" />
+                <!-- Wheelchair spokes -->
+                <line x1="170" y1="280" x2="170" y2="400" stroke="#94a3b8" stroke-width="2.5" />
+                <line x1="110" y1="340" x2="230" y2="340" stroke="#94a3b8" stroke-width="2.5" />
+                <line x1="128" y1="298" x2="212" y2="382" stroke="#94a3b8" stroke-width="2.5" />
+                <line x1="128" y1="382" x2="212" y2="298" stroke="#94a3b8" stroke-width="2.5" />
+                <!-- Wheelchair frame & seat -->
+                <path d="M 110,260 L 140,320 L 205,320 L 225,385" stroke="#0284c7" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                <rect x="135" y="312" width="75" height="14" rx="6" fill="#38bdf8" />
+                <rect x="110" y="220" width="12" height="90" rx="5" fill="#0284c7" />
               </g>
 
-              <!-- Interactive Click Anchors -->
-              <circle cx="150" cy="165" r="18" class="cursor-pointer transition fill-rose-500/20 stroke-rose-500 stroke-2 hover:fill-rose-500/50" onclick="clickDollPart('chest', '胸部')" />
-              <text x="150" y="171" text-anchor="middle" font-size="12" font-weight="900" fill="#e11d48">胸部</text>
+              <!-- Body Limbs: Legs -->
+              <g id="doll-legs" class="transition-opacity">
+                <!-- Left Leg -->
+                <rect id="leg-left" x="130" y="250" width="30" height="135" rx="15" fill="#fcd34d" class="cursor-pointer hover:opacity-85 transition" onclick="clickDollPart('legs', '雙腿/膝蓋')" />
+                <!-- Right Leg -->
+                <rect id="leg-right" x="180" y="250" width="30" height="135" rx="15" fill="#fcd34d" class="cursor-pointer hover:opacity-85 transition" onclick="clickDollPart('legs', '雙腿/膝蓋')" />
+                <!-- Shoes -->
+                <ellipse cx="145" cy="385" rx="20" ry="11" fill="#f59e0b" />
+                <ellipse cx="195" cy="385" rx="20" ry="11" fill="#f59e0b" />
+                <path d="M 130,385 Q 145,375 160,385" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" />
+                <path d="M 180,385 Q 195,375 210,385" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" />
+              </g>
 
-              <circle cx="150" cy="238" r="18" class="cursor-pointer transition fill-rose-500/20 stroke-rose-500 stroke-2 hover:fill-rose-500/50" onclick="clickDollPart('groin', '私密部位')" />
-              <text x="150" y="244" text-anchor="middle" font-size="12" font-weight="900" fill="#e11d48">私密</text>
+              <!-- Torso Body -->
+              <rect x="115" y="145" width="110" height="125" rx="28" fill="#fef08a" />
 
-              <circle cx="78" cy="175" r="16" class="cursor-pointer transition fill-amber-500/20 stroke-amber-500 stroke-2 hover:fill-amber-500/50" onclick="clickDollPart('shoulder-left', '肩膀/手肘')" />
-              <text x="78" y="180" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">手肘</text>
+              <!-- Casual Clothing (Default) -->
+              <g id="casual-clothes-group" class="transition-opacity duration-300">
+                <!-- T-shirt -->
+                <path d="M 110,150 Q 170,165 230,150 L 235,225 L 105,225 Z" fill="#67e8f9" rx="15" />
+                <circle cx="170" cy="188" r="14" fill="#ffffff" opacity="0.9" />
+                <path d="M 164,188 L 176,188 M 170,182 L 170,194" stroke="#0891b2" stroke-width="3" stroke-linecap="round" />
+                <!-- Casual Shorts -->
+                <path d="M 115,225 L 225,225 L 225,268 L 175,268 L 170,250 L 165,268 L 115,268 Z" fill="#818cf8" />
+              </g>
 
-              <circle cx="222" cy="175" r="16" class="cursor-pointer transition fill-amber-500/20 stroke-amber-500 stroke-2 hover:fill-amber-500/50" onclick="clickDollPart('shoulder-right', '肩膀/手肘')" />
-              <text x="222" y="180" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">手肘</text>
+              <!-- Swimsuit Layers (Visible when toggle checked) -->
+              <g id="swimsuit-group" class="opacity-0 transition-opacity duration-300 pointer-events-none">
+                <!-- Swimsuit top -->
+                <path id="swimsuit-top" d="M 112,152 Q 170,168 228,152 L 224,205 Q 170,215 116,205 Z" fill="#fb7185" class="cursor-pointer" />
+                <path d="M 130,152 L 138,135 M 210,152 L 202,135" stroke="#f43f5e" stroke-width="6" stroke-linecap="round" />
+                <!-- Swimsuit border indicator -->
+                <path d="M 112,152 Q 170,168 228,152 L 224,205 Q 170,215 116,205 Z" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3" fill="none" />
+                <!-- Swimsuit Bottom (Groin) -->
+                <path id="swimsuit-bottom" d="M 116,228 L 224,228 L 208,276 L 132,276 Z" fill="#fb7185" class="cursor-pointer" />
+                <path d="M 116,228 L 224,228 L 208,276 L 132,276 Z" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3" fill="none" />
+              </g>
 
-              <circle cx="48" cy="265" r="16" class="cursor-pointer transition fill-emerald-500/20 stroke-emerald-500 stroke-2 hover:fill-emerald-500/50" onclick="clickDollPart('hand-left', '手掌打招呼')" />
-              <text x="48" y="270" text-anchor="middle" font-size="11" font-weight="900" fill="#047857">揮手</text>
-              <circle cx="252" cy="265" r="16" class="cursor-pointer transition fill-emerald-500/20 stroke-emerald-500 stroke-2 hover:fill-emerald-500/50" onclick="clickDollPart('hand-right', '手掌打招呼')" />
-              <text x="252" y="270" text-anchor="middle" font-size="11" font-weight="900" fill="#047857">揮手</text>
+              <!-- Left Arm (Elbow & Hand) -->
+              <rect x="68" y="152" width="28" height="115" rx="14" fill="#fcd34d" transform="rotate(14 68 152)" class="cursor-pointer hover:opacity-85 transition" onclick="clickDollPart('shoulder-left', '手臂/手肘')" />
+              <circle cx="62" cy="272" r="18" fill="#fde68a" class="cursor-pointer hover:stroke-4 hover:stroke-emerald-400 transition" onclick="clickDollPart('hand-left', '手掌 (打招呼)')" />
 
-              <circle cx="150" cy="55" r="14" class="cursor-pointer transition fill-amber-500/20 stroke-amber-500 stroke-2 hover:fill-amber-500/50" onclick="clickDollPart('hair', '頭髮/頭部')" />
-              <text x="150" y="60" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">頭髮</text>
+              <!-- Right Arm (Friendly Waving) -->
+              <rect x="244" y="152" width="28" height="75" rx="14" fill="#fcd34d" transform="rotate(-30 244 152)" class="cursor-pointer hover:opacity-85 transition" onclick="clickDollPart('shoulder-right', '手臂/手肘')" />
+              <rect x="268" y="172" width="26" height="70" rx="13" fill="#fcd34d" transform="rotate(25 268 172)" class="cursor-pointer hover:opacity-85 transition" onclick="clickDollPart('shoulder-right', '手臂/手肘')" />
+              <circle cx="282" cy="245" r="19" fill="#fde68a" class="cursor-pointer hover:stroke-4 hover:stroke-emerald-400 transition" onclick="clickDollPart('hand-right', '手掌 (打招呼)')" />
+
+              <!-- Neck & Head -->
+              <rect x="156" y="120" width="28" height="30" fill="#fde68a" rx="8" />
+              <circle cx="170" cy="92" r="48" fill="#fde68a" class="cursor-pointer hover:stroke-2 hover:stroke-indigo-400 transition" onclick="clickDollPart('head', '頭部/臉頰')" />
+              <!-- Sweet Ears -->
+              <circle cx="122" cy="94" r="10" fill="#fde68a" />
+              <circle cx="218" cy="94" r="10" fill="#fde68a" />
+
+              <!-- Character Hair Layers (Switched via JS) -->
+              <g id="hair-star-group">
+                <path d="M 122,86 C 122,42 218,42 218,86 C 212,62 180,56 170,62 C 160,56 128,62 122,86 Z" fill="#334155" />
+                <path d="M 120,86 Q 135,108 142,86" stroke="#334155" stroke-width="4" fill="#334155" />
+                <path d="M 220,86 Q 205,108 198,86" stroke="#334155" stroke-width="4" fill="#334155" />
+                <!-- Star Hairpin -->
+                <polygon points="138,62 141,69 148,69 142,74 144,81 138,77 132,81 134,74 128,69 135,69" fill="#facc15" />
+              </g>
+
+              <g id="hair-sunny-group" class="hidden">
+                <path d="M 122,88 C 122,40 218,40 218,88 C 215,60 170,55 170,60 C 170,55 125,60 122,88 Z" fill="#78350f" />
+                <!-- Pigtails -->
+                <ellipse cx="112" cy="115" rx="14" ry="24" fill="#78350f" transform="rotate(-15 112 115)" />
+                <ellipse cx="228" cy="115" rx="14" ry="24" fill="#78350f" transform="rotate(15 228 115)" />
+                <circle cx="118" cy="98" r="6" fill="#f43f5e" />
+                <circle cx="222" cy="98" r="6" fill="#f43f5e" />
+              </g>
+
+              <g id="hair-ann-group" class="hidden">
+                <!-- Short spiky hair -->
+                <path d="M 120,84 C 118,36 222,36 220,84 C 205,50 185,48 170,56 C 155,48 135,50 120,84 Z" fill="#1e293b" />
+                <polygon points="145,46 152,32 158,48" fill="#1e293b" />
+                <polygon points="162,44 170,28 178,44" fill="#1e293b" />
+                <polygon points="182,46 190,34 196,48" fill="#1e293b" />
+              </g>
+
+              <g id="hair-yu-group" class="hidden">
+                <!-- Sporty Cap -->
+                <path d="M 122,84 C 122,46 218,46 218,84 Z" fill="#0284c7" />
+                <ellipse cx="170" cy="80" rx="55" ry="10" fill="#0369a1" />
+                <circle cx="170" cy="52" r="5" fill="#f59e0b" />
+              </g>
+
+              <!-- Cute Storybook Eyes & Expression -->
+              <circle cx="152" cy="90" r="5" fill="#0f172a" />
+              <circle cx="188" cy="90" r="5" fill="#0f172a" />
+              <circle cx="154" cy="88" r="1.8" fill="#ffffff" />
+              <circle cx="190" cy="88" r="1.8" fill="#ffffff" />
+              <!-- Rosy Cheeks -->
+              <ellipse cx="140" cy="99" rx="7" ry="4" fill="#f87171" opacity="0.6" />
+              <ellipse cx="200" cy="99" rx="7" ry="4" fill="#f87171" opacity="0.6" />
+              <!-- Gentle Smile -->
+              <path d="M 160,102 Q 170,114 180,102" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round" />
+
+              <!-- Interactive Clickable Halo Badges -->
+              <!-- Chest (Red) -->
+              <g class="cursor-pointer group" onclick="clickDollPart('chest', '胸部')">
+                <circle cx="170" cy="180" r="22" class="fill-rose-500/20 stroke-rose-500 stroke-2 group-hover:fill-rose-500/40 group-hover:scale-110 transition origin-[170px_180px]" />
+                <text x="170" y="185" text-anchor="middle" font-size="12" font-weight="900" fill="#be123c">胸部</text>
+              </g>
+
+              <!-- Groin / Private (Red) -->
+              <g class="cursor-pointer group" onclick="clickDollPart('groin', '私密部位')">
+                <circle cx="170" cy="252" r="22" class="fill-rose-500/20 stroke-rose-500 stroke-2 group-hover:fill-rose-500/40 group-hover:scale-110 transition origin-[170px_252px]" />
+                <text x="170" y="257" text-anchor="middle" font-size="12" font-weight="900" fill="#be123c">私密處</text>
+              </g>
+
+              <!-- Shoulders/Elbows (Yellow) -->
+              <g class="cursor-pointer group" onclick="clickDollPart('shoulder-left', '肩膀/手肘')">
+                <circle cx="92" cy="188" r="18" class="fill-amber-500/20 stroke-amber-500 stroke-2 group-hover:fill-amber-500/40 group-hover:scale-110 transition origin-[92px_188px]" />
+                <text x="92" y="193" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">手肘</text>
+              </g>
+              <g class="cursor-pointer group" onclick="clickDollPart('shoulder-right', '肩膀/手肘')">
+                <circle cx="250" cy="188" r="18" class="fill-amber-500/20 stroke-amber-500 stroke-2 group-hover:fill-amber-500/40 group-hover:scale-110 transition origin-[250px_188px]" />
+                <text x="250" y="193" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">手肘</text>
+              </g>
+
+              <!-- Hands (Green) -->
+              <g class="cursor-pointer group" onclick="clickDollPart('hand-left', '手掌打招呼')">
+                <circle cx="62" cy="272" r="18" class="fill-emerald-500/20 stroke-emerald-500 stroke-2 group-hover:fill-emerald-500/40 group-hover:scale-110 transition origin-[62px_272px]" />
+                <text x="62" y="277" text-anchor="middle" font-size="11" font-weight="900" fill="#047857">揮手</text>
+              </g>
+              <g class="cursor-pointer group" onclick="clickDollPart('hand-right', '手掌打招呼')">
+                <circle cx="282" cy="245" r="18" class="fill-emerald-500/20 stroke-emerald-500 stroke-2 group-hover:fill-emerald-500/40 group-hover:scale-110 transition origin-[282px_245px]" />
+                <text x="282" y="250" text-anchor="middle" font-size="11" font-weight="900" fill="#047857">揮手</text>
+              </g>
+
+              <!-- Head / Hair (Yellow) -->
+              <g class="cursor-pointer group" onclick="clickDollPart('head', '頭部與頭髮')">
+                <circle cx="170" cy="62" r="16" class="fill-amber-500/20 stroke-amber-500 stroke-2 group-hover:fill-amber-500/40 group-hover:scale-110 transition origin-[170px_62px]" />
+                <text x="170" y="67" text-anchor="middle" font-size="11" font-weight="900" fill="#b45309">頭部</text>
+              </g>
+
+              <!-- Placed Signal Magnet Badges on the Doll (Injected via JS) -->
+              <g id="placed-pins-layer"></g>
+
             </svg>
 
             <!-- Floating Sticker on doll -->
-            <div id="placed-sticker-display" class="absolute bottom-3 left-3 bg-white/95 backdrop-blur px-4 py-2 rounded-2xl border border-indigo-200 text-sm shadow-md flex items-center gap-2.5">
-              <span class="w-3.5 h-3.5 rounded-full bg-slate-300" id="current-selected-pin"></span>
-              <span id="placed-feedback-mini" class="text-slate-700 font-black">點選部位貼上信號貼</span>
+            <div id="placed-sticker-display" class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-indigo-200 text-xs sm:text-sm shadow-md flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-slate-300 shrink-0" id="current-selected-pin"></span>
+                <span id="placed-feedback-mini" class="text-slate-700 font-black">點選部位貼上信號貼</span>
+              </div>
+              <button onclick="resetDollPins()" class="text-slate-400 hover:text-rose-500 text-xs font-bold transition" title="重置貼紙"><i class="fa-solid fa-rotate-left"></i> 清除貼紙</button>
             </div>
           </div>
         </div>
@@ -361,7 +622,7 @@
         <div class="lg:col-span-5 space-y-4">
           
           <!-- Signal Magnet Drawer -->
-          <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-3.5">
+          <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-card-float border border-slate-200 space-y-3.5">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                 <i class="fa-solid fa-shapes text-indigo-600"></i>
@@ -375,7 +636,7 @@
 
             <div class="grid grid-cols-3 gap-3 pt-1">
               <!-- Red Magnet -->
-              <button onclick="selectMagnet('red')" id="magnet-red" class="magnet-tool p-3.5 rounded-2xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 flex flex-col items-center gap-2 transition text-center shadow-sm">
+              <button onclick="selectMagnet('red')" id="magnet-red" class="magnet-tool p-3.5 rounded-2xl border-2 border-rose-400 bg-rose-50 hover:bg-rose-100 flex flex-col items-center gap-2 transition text-center shadow-btn-rose-3d btn-tactile ring-4 ring-indigo-400">
                 <div class="w-12 h-12 rounded-full bg-rose-500 text-white flex items-center justify-center text-xl font-black shadow-md">
                   <i class="fa-solid fa-ban"></i>
                 </div>
@@ -384,7 +645,7 @@
               </button>
 
               <!-- Yellow Magnet -->
-              <button onclick="selectMagnet('yellow')" id="magnet-yellow" class="magnet-tool p-3.5 rounded-2xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center gap-2 transition text-center shadow-sm">
+              <button onclick="selectMagnet('yellow')" id="magnet-yellow" class="magnet-tool p-3.5 rounded-2xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 flex flex-col items-center gap-2 transition text-center shadow-btn-amber-3d btn-tactile">
                 <div class="w-12 h-12 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xl font-black shadow-md">
                   <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
@@ -393,7 +654,7 @@
               </button>
 
               <!-- Green Magnet -->
-              <button onclick="selectMagnet('green')" id="magnet-green" class="magnet-tool p-3.5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 flex flex-col items-center gap-2 transition text-center shadow-sm">
+              <button onclick="selectMagnet('green')" id="magnet-green" class="magnet-tool p-3.5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 flex flex-col items-center gap-2 transition text-center shadow-btn-emerald-3d btn-tactile">
                 <div class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xl font-black shadow-md">
                   <i class="fa-solid fa-check"></i>
                 </div>
@@ -402,16 +663,16 @@
               </button>
             </div>
             
-            <div id="active-magnet-hint" class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-sm text-indigo-800 font-black text-center flex items-center justify-center gap-2">
+            <div id="active-magnet-hint" class="bg-rose-50 border border-rose-300 rounded-2xl p-3 text-sm text-rose-900 font-black text-center flex items-center justify-center gap-2">
               <span>目前已選取：<span id="selected-magnet-name" class="underline">紅色磁貼 (隱私禁止)</span>，請點擊布偶身體部位！</span>
-              <button onclick="speakText(document.getElementById('active-magnet-hint').innerText)" class="w-5 h-5 rounded-full bg-indigo-200 text-indigo-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
+              <button onclick="speakText(document.getElementById('active-magnet-hint').innerText)" class="w-5 h-5 rounded-full bg-rose-200 text-rose-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
             </div>
           </div>
 
           <!-- Interactive Feedback Card -->
-          <div id="doll-part-feedback-card" class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-3.5 transition-all">
+          <div id="doll-part-feedback-card" class="bg-white rounded-3xl p-5 sm:p-6 shadow-card-float border border-slate-200 space-y-3.5 transition-all">
             <div class="flex items-center justify-between">
-              <span id="feedback-badge" class="px-3.5 py-1.5 rounded-full text-sm font-black bg-rose-100 text-rose-700">
+              <span id="feedback-badge" class="px-3.5 py-1.5 rounded-full text-sm font-black bg-rose-100 text-rose-700 shadow-xs">
                 <i class="fa-solid fa-shield-halved"></i> 身體隱私保護區
               </span>
               <button onclick="speakCurrentFeedback()" class="tts-speaker-btn tts-speaker-btn-rose" title="聽語音朗讀部位說明">
@@ -442,37 +703,37 @@
       </div>
 
       <!-- SUB-TOOL 1.2: 多感官同心圓地墊 -->
-      <div id="p1-tool-circles" class="hidden bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-6">
+      <div id="p1-tool-circles" class="hidden bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-6">
         <div class="max-w-3xl space-y-2">
           <div class="flex items-center gap-3">
             <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-circle-notch text-amber-500"></i>
               <span>多感官同心圓地墊 ——「安全社交距離圈」互動演練</span>
             </h3>
-            <button onclick="speakText('多感官同心圓地墊，安全社交距離圈互動演練。模擬實體多感官同心圓軟墊。請點擊不同層級的圓圈，學習與特教同學、好朋友或全班同學相處的安全界限。')" class="tts-speaker-btn tts-speaker-btn-amber" title="朗讀同心圓介紹"><i class="fa-solid fa-volume-high"></i></button>
+            <button onclick="speakText('多感官同心圓地墊，安全社交距離圈互動演練。模擬實體多感官同心圓軟墊。請點擊不同層級的圓圈或下方漫步按鈕，學習與特教同學、好朋友或全班同學相處的安全界限。')" class="tts-speaker-btn tts-speaker-btn-amber" title="朗讀同心圓介紹"><i class="fa-solid fa-volume-high"></i></button>
           </div>
           <p class="text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
-            模擬實體多感官同心圓軟墊。請點擊不同層級的圓圈，學習與特教同學、好朋友或全班同學相處的安全界限。
+            模擬實體多感官同心圓軟墊。點擊不同層級圓圈，或使用漫步按鈕，體驗人際距離與尊重禮儀！
           </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           
           <!-- Concentric Circles Visual Canvas -->
-          <div class="lg:col-span-7 flex flex-col items-center justify-center p-4 bg-slate-50 rounded-3xl border border-slate-200">
+          <div class="lg:col-span-7 flex flex-col items-center justify-center p-4 sm:p-6 bg-slate-50/80 rounded-3xl border border-slate-200">
             <div class="relative w-80 h-80 sm:w-[420px] sm:h-[420px] flex items-center justify-center">
               
               <!-- Outer Ring: Green Light Courtesy Zone -->
-              <div onclick="selectCircleZone('green')" class="absolute inset-0 rounded-full border-[10px] border-emerald-400 bg-emerald-100/75 hover:bg-emerald-200/90 cursor-pointer transition flex items-start justify-center pt-4 shadow-md group">
-                <span class="text-sm sm:text-base font-black text-emerald-950 bg-white/95 px-4 py-1.5 rounded-full shadow-sm group-hover:scale-105 transition flex items-center gap-2">
-                  <i class="fa-solid fa-hand text-emerald-600"></i> 外層：綠燈禮貌圈 (一般互動)
+              <div onclick="selectCircleZone('green')" class="absolute inset-0 rounded-full border-[10px] border-emerald-400 bg-emerald-100/75 hover:bg-emerald-200/90 cursor-pointer transition flex items-start justify-center pt-3.5 shadow-md group">
+                <span class="text-xs sm:text-sm font-black text-emerald-950 bg-white/95 px-3.5 py-1 rounded-full shadow-sm group-hover:scale-105 transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-hand text-emerald-600"></i> 外層：綠燈禮貌圈 (1~2公尺)
                 </span>
               </div>
 
               <!-- Middle Ring: Yellow Light Friend Zone -->
-              <div onclick="selectCircleZone('yellow')" class="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full border-[10px] border-amber-400 bg-amber-100/90 hover:bg-amber-200 cursor-pointer transition flex items-start justify-center pt-3.5 shadow-md z-10 group">
-                <span class="text-sm font-black text-amber-950 bg-white/95 px-3.5 py-1.5 rounded-full shadow-sm group-hover:scale-105 transition flex items-center gap-1.5">
-                  <i class="fa-solid fa-handshake-angle text-amber-600"></i> 中層：黃燈朋友圈 (熟識好友)
+              <div onclick="selectCircleZone('yellow')" class="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full border-[10px] border-amber-400 bg-amber-100/90 hover:bg-amber-200 cursor-pointer transition flex items-start justify-center pt-3 shadow-md z-10 group">
+                <span class="text-xs sm:text-sm font-black text-amber-950 bg-white/95 px-3 py-1 rounded-full shadow-sm group-hover:scale-105 transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-handshake-angle text-amber-600"></i> 中層：黃燈朋友圈 (0.5~1公尺)
                 </span>
               </div>
 
@@ -480,22 +741,41 @@
               <div onclick="selectCircleZone('red')" class="absolute w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-rose-500 bg-rose-500 hover:bg-rose-600 text-white cursor-pointer transition flex flex-col items-center justify-center p-2 shadow-xl z-20 pulse-ring text-center">
                 <i class="fa-solid fa-heart text-2xl sm:text-3xl mb-1 text-white"></i>
                 <span class="text-xs sm:text-sm font-black">紅燈核心圈</span>
-                <span class="text-[10px] sm:text-xs font-bold opacity-95">我自己的身體</span>
+                <span class="text-[10px] sm:text-xs font-bold opacity-95">我自己的身體 (0公尺)</span>
+              </div>
+
+              <!-- Interactive Walking Avatar Marker -->
+              <div id="walking-avatar" class="absolute z-30 transition-all duration-700 pointer-events-none flex flex-col items-center" style="top: 15px; left: 50%; transform: translateX(-50%);">
+                <!-- Speech bubble -->
+                <div id="avatar-bubble" class="bg-slate-900 text-white text-[11px] font-black px-2.5 py-1 rounded-xl shadow-lg whitespace-nowrap mb-1 flex items-center gap-1 border border-slate-700 animate-bounce">
+                  <span id="avatar-bubble-text">早安！揮揮手！</span>
+                </div>
+                <!-- Avatar icon -->
+                <div class="w-10 h-10 rounded-full bg-white border-2 border-indigo-600 shadow-lg flex items-center justify-center text-indigo-600 text-lg">
+                  <i class="fa-solid fa-child"></i>
+                </div>
               </div>
 
             </div>
 
-            <!-- Footprints position indicator -->
-            <div class="mt-5 flex flex-wrap items-center justify-center gap-4 text-sm font-black text-slate-600">
-              <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-rose-500"></span> 核心：0公尺 (完全隱私)</span>
-              <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-amber-400"></span> 中層：伸手碰手肘距離 (先問問)</span>
-              <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-400"></span> 外層：揮手招呼距離</span>
+            <!-- Avatar Walk Controller -->
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <span class="text-xs sm:text-sm font-black text-slate-600 mr-1">小夥伴漫步：</span>
+              <button onclick="walkAvatarTo('green')" class="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs sm:text-sm font-black border border-emerald-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-shoe-prints text-emerald-600"></i> 走進綠燈禮貌圈
+              </button>
+              <button onclick="walkAvatarTo('yellow')" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs sm:text-sm font-black border border-amber-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-shoe-prints text-amber-600"></i> 走進黃燈朋友圈
+              </button>
+              <button onclick="walkAvatarTo('red')" class="px-3 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-900 text-xs sm:text-sm font-black border border-rose-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-shield-heart text-rose-600"></i> 進入核心隱私圈
+              </button>
             </div>
           </div>
 
           <!-- Zone Detailed Explanation Card -->
           <div class="lg:col-span-5 space-y-4">
-            <div id="circle-detail-card" class="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm transition-all">
+            <div id="circle-detail-card" class="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-5 sm:p-6 space-y-4 shadow-card-float transition-all">
               <div class="flex items-center justify-between">
                 <span id="circle-badge" class="px-4 py-1.5 rounded-full text-sm font-black bg-emerald-200 text-emerald-900">
                   <i class="fa-solid fa-street-view"></i> 綠燈禮貌圈
@@ -544,10 +824,10 @@
       </div>
 
       <!-- SUB-TOOL 1.3: AAC雙面語音牌 -->
-      <div id="p1-tool-aac" class="hidden bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-6">
+      <div id="p1-tool-aac" class="hidden bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-6">
         <div class="max-w-3xl space-y-2">
           <div class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-purple-700 bg-purple-100 px-3.5 py-1.5 rounded-full">
-            <i class="fa-solid fa-ear-listen"></i> 輔助溝通系統 (AAC) 整合
+            <i class="fa-solid fa-ear-listen"></i> 輔助溝通系統 (AAC) 雙向整合
           </div>
           <div class="flex items-center gap-3">
             <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-2">
@@ -561,80 +841,94 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           <!-- Card 1: Ask Permission Button -->
-          <div class="bg-gradient-to-b from-blue-50 to-indigo-50 border-2 border-indigo-200 rounded-3xl p-5 sm:p-6 flex flex-col justify-between items-center text-center shadow-sm space-y-4">
-            <div class="space-y-1.5">
-              <span class="text-xs sm:text-sm font-black text-indigo-700 bg-white px-3.5 py-1 rounded-full border border-indigo-100">
-                徵詢同意句
+          <div class="bg-gradient-to-b from-blue-50 to-indigo-50 border-2 border-indigo-200 rounded-3xl p-5 flex flex-col justify-between items-center text-center shadow-sm space-y-3 hover:border-indigo-400 transition">
+            <div class="space-y-1">
+              <span class="text-xs font-black text-indigo-700 bg-white px-3 py-0.5 rounded-full border border-indigo-100">
+                1. 徵詢同意句
               </span>
-              <div class="flex items-center justify-center gap-2">
-                <h4 class="text-lg sm:text-xl font-black text-slate-800">我想牽你的手可以嗎？</h4>
-                <button onclick="speakText('我想牽你的手可以嗎？')" class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
-              </div>
+              <h4 class="text-base sm:text-lg font-black text-slate-800">我想牽你的手可以嗎？</h4>
             </div>
 
-            <!-- Big Push Button -->
-            <button onclick="playAACSounds('ask-hand', '我可以牽你的手排隊嗎？')" class="w-36 h-36 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-indigo-200 group border-4 border-white">
-              <i class="fa-solid fa-hands-holding text-4xl mb-1.5 group-hover:animate-bounce"></i>
-              <span class="text-base font-black">按下發聲</span>
+            <button onclick="playAACSounds('ask-hand', '我可以牽你的手排隊嗎？')" class="w-32 h-32 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-indigo-200 group border-4 border-white btn-tactile">
+              <i class="fa-solid fa-hands-holding text-3xl mb-1 group-hover:animate-bounce"></i>
+              <span class="text-sm font-black">按下發問</span>
             </button>
 
-            <div class="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-600 font-bold">
-              <span>排隊、玩遊戲前先按一下發問，等待對方回答。</span>
-              <button onclick="speakText('排隊、玩遊戲前先按一下發問，等待對方回答。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀說明"><i class="fa-solid fa-volume-high"></i></button>
-            </div>
+            <span class="text-xs text-slate-600 font-bold">排隊、玩遊戲前先按一下發問</span>
           </div>
 
           <!-- Card 2: OK Smile Green Card -->
-          <div class="bg-gradient-to-b from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-3xl p-5 sm:p-6 flex flex-col justify-between items-center text-center shadow-sm space-y-4">
-            <div class="space-y-1.5">
-              <span class="text-xs sm:text-sm font-black text-emerald-800 bg-white px-3.5 py-1 rounded-full border border-emerald-200">
-                同意表態 (綠牌)
+          <div class="bg-gradient-to-b from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-3xl p-5 flex flex-col justify-between items-center text-center shadow-sm space-y-3 hover:border-emerald-500 transition">
+            <div class="space-y-1">
+              <span class="text-xs font-black text-emerald-800 bg-white px-3 py-0.5 rounded-full border border-emerald-200">
+                2. 同意表態 (OK綠牌)
               </span>
-              <div class="flex items-center justify-center gap-2">
-                <h4 class="text-lg sm:text-xl font-black text-slate-800">好的，我可以牽手！</h4>
-                <button onclick="speakText('好的，我可以牽手！')" class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
-              </div>
+              <h4 class="text-base sm:text-lg font-black text-slate-800">好的，我可以牽手！</h4>
             </div>
 
-            <!-- Big Push Button -->
-            <button onclick="playAACSounds('agree', '好的，我同意！我們可以牽牽手一起走！')" class="w-36 h-36 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-emerald-200 group border-4 border-white">
-              <i class="fa-solid fa-face-smile text-4xl mb-1.5 group-hover:scale-110 transition"></i>
-              <span class="text-base font-black">出示 OK 綠牌</span>
+            <button onclick="playAACSounds('agree', '好的，我同意！我們可以牽牽手一起走！')" class="w-32 h-32 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-emerald-200 group border-4 border-white btn-tactile">
+              <i class="fa-solid fa-face-smile text-3xl mb-1 group-hover:scale-110 transition"></i>
+              <span class="text-sm font-black">出示 OK 綠牌</span>
             </button>
 
-            <div class="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-600 font-bold">
-              <span>自己感覺舒服、願意時出示微笑綠牌。</span>
-              <button onclick="speakText('自己感覺舒服、願意時出示微笑綠牌。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀說明"><i class="fa-solid fa-volume-high"></i></button>
-            </div>
+            <span class="text-xs text-slate-600 font-bold">自己感覺舒服願意時出示</span>
           </div>
 
           <!-- Card 3: NO Cross Red Card (Clear Refusal) -->
-          <div class="bg-gradient-to-b from-rose-50 to-red-50 border-2 border-rose-300 rounded-3xl p-5 sm:p-6 flex flex-col justify-between items-center text-center shadow-sm space-y-4">
-            <div class="space-y-1.5">
-              <span class="text-xs sm:text-sm font-black text-rose-800 bg-white px-3.5 py-1 rounded-full border border-rose-200">
-                拒絕表態 (紅牌)
+          <div class="bg-gradient-to-b from-rose-50 to-red-50 border-2 border-rose-300 rounded-3xl p-5 flex flex-col justify-between items-center text-center shadow-sm space-y-3 hover:border-rose-500 transition">
+            <div class="space-y-1">
+              <span class="text-xs font-black text-rose-800 bg-white px-3 py-0.5 rounded-full border border-rose-200">
+                3. 拒絕表態 (NO紅牌)
               </span>
-              <div class="flex items-center justify-center gap-2">
-                <h4 class="text-lg sm:text-xl font-black text-slate-800">請不要碰我，我不喜歡！</h4>
-                <button onclick="speakText('請不要碰我，我不喜歡！')" class="w-6 h-6 rounded-full bg-rose-100 text-rose-800 text-xs flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
-              </div>
+              <h4 class="text-base sm:text-lg font-black text-slate-800">請不要碰我，我不喜歡！</h4>
             </div>
 
-            <!-- Big Push Button -->
-            <button onclick="playAACSounds('refuse', '請停下來！請不要碰我，我不喜歡這樣！')" class="w-36 h-36 rounded-full bg-gradient-to-tr from-rose-500 to-red-500 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-rose-200 group border-4 border-white">
-              <i class="fa-solid fa-hand-dots text-4xl mb-1.5 group-hover:wiggle"></i>
-              <span class="text-base font-black">出示 NO 紅牌</span>
+            <button onclick="playAACSounds('refuse', '請停下來！請不要碰我，我不喜歡這樣！')" class="w-32 h-32 rounded-full bg-gradient-to-tr from-rose-500 to-red-500 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-rose-200 group border-4 border-white btn-tactile">
+              <i class="fa-solid fa-hand-dots text-3xl mb-1 group-hover:wiggle"></i>
+              <span class="text-sm font-black">出示 NO 紅牌</span>
             </button>
 
-            <div class="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-slate-600 font-bold">
-              <span>感覺不舒服時，不用害怕，明確說「不行」！</span>
-              <button onclick="speakText('感覺不舒服時，不用害怕，明確說不行！')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀說明"><i class="fa-solid fa-volume-high"></i></button>
-            </div>
+            <span class="text-xs text-slate-600 font-bold">感覺不舒服時勇敢說「不行」</span>
           </div>
 
+          <!-- Card 4: Stop & Respect (STOP Card) -->
+          <div class="bg-gradient-to-b from-purple-50 to-fuchsia-50 border-2 border-purple-300 rounded-3xl p-5 flex flex-col justify-between items-center text-center shadow-sm space-y-3 hover:border-purple-500 transition">
+            <div class="space-y-1">
+              <span class="text-xs font-black text-purple-800 bg-white px-3 py-0.5 rounded-full border border-purple-200">
+                4. 尊重停下 (STOP牌)
+              </span>
+              <h4 class="text-base sm:text-lg font-black text-slate-800">收到，我會立刻停下！</h4>
+            </div>
+
+            <button onclick="playAACSounds('respect-stop', '好的！我尊重你的決定，我會立刻停下來！')" class="w-32 h-32 rounded-full bg-gradient-to-tr from-purple-500 to-fuchsia-500 hover:scale-105 active:scale-95 transition-all text-white flex flex-col items-center justify-center shadow-lg shadow-purple-200 group border-4 border-white btn-tactile">
+              <i class="fa-solid fa-circle-stop text-3xl mb-1 group-hover:scale-110 transition"></i>
+              <span class="text-sm font-black">尊重停下來</span>
+            </button>
+
+            <span class="text-xs text-slate-600 font-bold">聽見對方說不，立刻退回綠燈圈</span>
+          </div>
+
+        </div>
+
+        <!-- Roleplay Dialogue Simulator -->
+        <div class="bg-slate-50 border border-slate-200 rounded-3xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-black"><i class="fa-solid fa-comments"></i></span>
+              <h4 class="text-base font-black text-slate-800">普特兩人一組：雙向對話模擬器</h4>
+            </div>
+            <span class="text-xs text-slate-500 font-bold">模擬同儕徵詢與回應</span>
+          </div>
+
+          <!-- Dialogue display window -->
+          <div id="aac-dialogue-window" class="bg-white rounded-2xl p-4 border border-slate-200 min-h-[90px] flex flex-col gap-2 justify-center">
+            <div class="text-sm text-slate-400 italic text-center font-bold">
+              請點擊上方按鈕，即時產生並播報雙向溝通對話紀錄...
+            </div>
+          </div>
         </div>
 
         <!-- Roleplay Practice Box -->
@@ -650,7 +944,7 @@
               普通生學習「<strong>不隨意拉扯、擁抱特教同學，哪怕是出於好心也必須先問過</strong>」；特教生學習「<strong>利用牌卡或語音按鈕，勇敢表達喜好與身體界限</strong>」。
             </p>
           </div>
-          <button onclick="playAACSounds('respect', '每個人都有身體自主權，別人說不，我們就要馬上停下來！')" class="shrink-0 px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-sm shadow transition flex items-center gap-2">
+          <button onclick="playAACSounds('respect', '每個人都有身體自主權，別人說不，我們就要馬上停下來！')" class="shrink-0 px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-sm shadow transition flex items-center gap-2 btn-tactile">
             <i class="fa-solid fa-volume-high text-base"></i>
             <span>朗讀融合核心準則</span>
           </button>
@@ -665,14 +959,17 @@
     <!-- ========================================================================= -->
     <section id="module-plan2" class="hidden space-y-6">
       <!-- Section Intro Banner -->
-      <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/80 rounded-3xl p-5 sm:p-6 relative overflow-hidden shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200/90 rounded-3xl p-5 sm:p-6 relative overflow-hidden shadow-sm">
+        <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none text-9xl text-purple-600">
+          <i class="fa-solid fa-scale-unbalanced-flip"></i>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-indigo-700 bg-indigo-100/90 px-3.5 py-1.5 rounded-full">
+            <div class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-indigo-700 bg-indigo-100/90 px-3.5 py-1.5 rounded-full shadow-xs">
               <i class="fa-solid fa-brain text-sm"></i> 適用國小 3-6 年級 / 資源班與普通班融合
             </div>
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
+              <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-kids">
                 多元密碼破譯戰 —— 性別特質與融合人際天平
               </h2>
               <button onclick="speakText('多元密碼破譯戰，性別特質與融合人際天平。打破雙重刻板印象：性別刻板與身障偏見！解碼校園微歧視與騷擾霸凌情境，運用停、看、說鷹架式三步驟尺規，共同平衡友善人際天平。')" class="tts-speaker-btn" title="朗讀方案二說明"><i class="fa-solid fa-volume-high"></i></button>
@@ -682,21 +979,21 @@
             </p>
           </div>
           <div class="flex gap-2.5 text-center text-sm font-black self-start md:self-auto shrink-0">
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-indigo-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-indigo-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-indigo-600 text-lg font-black">
                 <i class="fa-solid fa-tag"></i> 特質
                 <button onclick="speakText('特質沒有標籤：打破男女與身障標籤束縛。')" class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <div class="text-slate-600 text-xs font-bold mt-0.5">打破標籤束縛</div>
             </div>
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-purple-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-purple-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-purple-600 text-lg font-black">
                 <i class="fa-solid fa-shield-virus"></i> 拆彈
                 <button onclick="speakText('拆彈尺規：停、看、說三步驟，辨別情緒、意圖並勇敢拒絕求助。')" class="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <div class="text-slate-600 text-xs font-bold mt-0.5">停·看·說應對</div>
             </div>
-            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-pink-200 shadow-sm flex flex-col items-center">
+            <div class="bg-white/95 px-3.5 py-2.5 rounded-2xl border border-pink-200 shadow-sm flex flex-col items-center hover:scale-105 transition">
               <div class="flex items-center gap-1.5 text-pink-600 text-lg font-black">
                 <i class="fa-solid fa-scale-balanced"></i> 天平
                 <button onclick="speakText('友善天平：班級共同承諾公約，用愛消除偏見。')" class="w-5 h-5 rounded-full bg-pink-100 text-pink-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
@@ -709,20 +1006,20 @@
 
       <!-- Plan 2 Sub-Nav -->
       <div class="flex flex-wrap gap-2.5 border-b border-slate-200 pb-3.5">
-        <button onclick="setPlan2Tool('traits')" id="btn-p2-traits" class="p2-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200">
+        <button onclick="setPlan2Tool('traits')" id="btn-p2-traits" class="p2-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200 btn-tactile">
           <i class="fa-solid fa-tags text-lg"></i> 1. 「特質沒有標籤」翻翻分類盤
         </button>
-        <button onclick="setPlan2Tool('scenarios')" id="btn-p2-scenarios" class="p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+        <button onclick="setPlan2Tool('scenarios')" id="btn-p2-scenarios" class="p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile">
           <i class="fa-solid fa-bomb text-rose-500 text-lg"></i> 2. 校園情境拆彈板 & 停看說尺規
         </button>
-        <button onclick="setPlan2Tool('scale')" id="btn-p2-scale" class="p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">
+        <button onclick="setPlan2Tool('scale')" id="btn-p2-scale" class="p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile">
           <i class="fa-solid fa-scale-balanced text-amber-500 text-lg"></i> 3. 班級友善人際天平公約樹
         </button>
       </div>
 
-      <!-- SUB-TOOL 2.1: 特質分類盤 (Drag and drop with speakers) -->
+      <!-- SUB-TOOL 2.1: 特質分類盤 -->
       <div id="p2-tool-traits" class="space-y-6">
-        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-4">
+        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div class="flex items-center gap-3">
@@ -733,12 +1030,17 @@
                 <button onclick="speakText('特質沒有標籤拖曳分類盤，破除性別與特教刻板印象。操作方式：按住卡片直接拖曳至下方分類框中釋放；亦可直接點選卡牌進行分類！')" class="tts-speaker-btn" title="朗讀功能說明"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <p class="text-sm sm:text-base text-slate-700 font-semibold mt-1">
-                <strong class="text-purple-700"><i class="fa-solid fa-hand-pointer"></i> 操作方式：</strong>按住卡片<strong>直接拖曳</strong>至下方分類框中釋放；亦可點擊卡牌旁的喇叭聆聽解碼！
+                <strong class="text-purple-700"><i class="fa-solid fa-hand-pointer"></i> 操作方式：</strong>按住卡片<strong>拖曳</strong>至下方分類框；亦可點擊卡片旁的語音聆聽解碼！
               </p>
             </div>
-            <button onclick="resetTraitCards()" class="text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 font-black px-4 py-2 rounded-xl border border-slate-300 self-start sm:self-auto transition flex items-center gap-2 shadow-xs">
-              <i class="fa-solid fa-rotate-left"></i> 重置所有卡片
-            </button>
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+              <button onclick="showAddTraitModal()" class="text-sm bg-purple-50 hover:bg-purple-100 text-purple-700 font-black px-3.5 py-2 rounded-xl border border-purple-200 transition flex items-center gap-1.5 shadow-xs btn-tactile">
+                <i class="fa-solid fa-plus-circle"></i> 自訂特質卡
+              </button>
+              <button onclick="resetTraitCards()" class="text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 font-black px-3.5 py-2 rounded-xl border border-slate-300 transition flex items-center gap-1.5 shadow-xs btn-tactile">
+                <i class="fa-solid fa-rotate-left"></i> 重置卡片
+              </button>
+            </div>
           </div>
 
           <!-- Interactive Card Deck to Classify -->
@@ -746,13 +1048,13 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-layer-group text-purple-500 text-base"></i> 待分類特質卡牌（支援拖曳與語音朗讀）：
+                  <i class="fa-solid fa-layer-group text-purple-500 text-base"></i> 待分類特質卡牌（支援拖曳、觸控與語音朗讀）：
                 </span>
                 <button onclick="speakText('待分類特質卡牌，請將卡片分類至只屬於男孩、所有人都可以、或只屬於女孩。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <span class="text-xs text-slate-400 font-bold hidden sm:inline">拖曳卡片到下方任意區域</span>
+              <span class="text-xs text-slate-400 font-bold hidden sm:inline">拖曳卡片到下方區域</span>
             </div>
-            <div id="trait-cards-deck" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'unassigned')" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 p-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 min-h-[140px] transition-all">
+            <div id="trait-cards-deck" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'unassigned')" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 p-3.5 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 min-h-[140px] transition-all">
               <!-- Injected dynamically -->
             </div>
           </div>
@@ -760,11 +1062,11 @@
           <!-- Three Target Categorization Buckets -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <!-- Bucket 1: Boy Only -->
-            <div id="dropzone-boy" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'boy')" class="drop-zone bg-blue-50/75 border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[230px] transition-all duration-200">
+            <div id="dropzone-boy" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'boy')" class="drop-zone bg-blue-50/75 border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[220px] transition-all duration-200">
               <div class="flex items-center justify-between mb-2.5">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-black text-blue-900 bg-blue-100 px-3.5 py-1 rounded-full flex items-center gap-1.5">
-                    <i class="fa-solid fa-mars text-base"></i> 只屬於男孩
+                  <span class="text-sm font-black text-blue-900 bg-blue-100 px-3.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-mars text-base"></i> 只屬於男孩？
                   </span>
                   <button onclick="speakText('只屬於男孩分類盤')" class="w-5 h-5 rounded-full bg-blue-200 text-blue-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
@@ -779,16 +1081,16 @@
             </div>
 
             <!-- Bucket 2: Both / Everyone Can -->
-            <div id="dropzone-all" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'all')" class="drop-zone bg-gradient-to-b from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-400 hover:border-emerald-600 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[230px] shadow-sm relative overflow-hidden transition-all duration-200">
-              <div class="absolute -right-6 -bottom-6 text-emerald-200/40 text-9xl pointer-events-none">
+            <div id="dropzone-all" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'all')" class="drop-zone bg-gradient-to-b from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-400 hover:border-emerald-600 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[220px] shadow-sm relative overflow-hidden transition-all duration-200">
+              <div class="absolute -right-6 -bottom-6 text-emerald-200/30 text-9xl pointer-events-none">
                 <i class="fa-solid fa-heart"></i>
               </div>
               <div class="flex items-center justify-between mb-2.5 z-10">
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-black text-emerald-950 bg-emerald-200 px-4 py-1 rounded-full flex items-center gap-2 shadow-xs">
-                    <i class="fa-solid fa-people-robotic text-emerald-700"></i> 兩者/所有人都可以 (多元融合)
+                    <i class="fa-solid fa-people-robotic text-emerald-700"></i> 所有人都可以！(多元共融)
                   </span>
-                  <button onclick="speakText('兩者、所有人都可以，多元融合分類盤。最包容的視角！')" class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
+                  <button onclick="speakText('所有人都可以，多元共融分類盤。最包容的視角！')" class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
                 <span id="count-all" class="text-xs font-black text-emerald-800 bg-white px-2.5 py-1 rounded-lg border border-emerald-200">0 項</span>
               </div>
@@ -801,11 +1103,11 @@
             </div>
 
             <!-- Bucket 3: Girl Only -->
-            <div id="dropzone-girl" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'girl')" class="drop-zone bg-pink-50/75 border-2 border-dashed border-pink-300 hover:border-pink-500 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[230px] transition-all duration-200">
+            <div id="dropzone-girl" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'girl')" class="drop-zone bg-pink-50/75 border-2 border-dashed border-pink-300 hover:border-pink-500 rounded-3xl p-4 sm:p-5 flex flex-col min-h-[220px] transition-all duration-200">
               <div class="flex items-center justify-between mb-2.5">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-black text-pink-900 bg-pink-100 px-3.5 py-1 rounded-full flex items-center gap-1.5">
-                    <i class="fa-solid fa-venus text-base"></i> 只屬於女孩
+                  <span class="text-sm font-black text-pink-900 bg-pink-100 px-3.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-venus text-base"></i> 只屬於女孩？
                   </span>
                   <button onclick="speakText('只屬於女孩分類盤')" class="w-5 h-5 rounded-full bg-pink-200 text-pink-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
@@ -821,7 +1123,7 @@
           </div>
 
           <!-- Dynamic Learning Insight Box -->
-          <div id="trait-insight-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2">
+          <div id="trait-insight-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2 shadow-inner">
             <div class="flex items-center justify-between">
               <div class="font-black text-indigo-700 flex items-center gap-2 text-base">
                 <i class="fa-solid fa-lightbulb text-lg"></i>
@@ -842,7 +1144,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           <!-- Scenario selector tab (Left 5 Cols) -->
-          <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 shadow-card-float border border-slate-200 space-y-4">
             <div>
               <div class="flex items-center gap-2">
                 <span class="text-xs sm:text-sm font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
@@ -856,7 +1158,7 @@
 
             <!-- Scenario Selection Buttons -->
             <div class="space-y-3">
-              <button onclick="selectScenario('A')" id="scen-btn-A" class="scen-btn w-full p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-left transition flex items-start gap-3.5">
+              <button onclick="selectScenario('A')" id="scen-btn-A" class="scen-btn w-full p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-left transition flex items-start gap-3.5 btn-tactile">
                 <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0">A</span>
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
@@ -867,7 +1169,7 @@
                 </div>
               </button>
 
-              <button onclick="selectScenario('B')" id="scen-btn-B" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5">
+              <button onclick="selectScenario('B')" id="scen-btn-B" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5 btn-tactile">
                 <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">B</span>
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
@@ -878,7 +1180,7 @@
                 </div>
               </button>
 
-              <button onclick="selectScenario('C')" id="scen-btn-C" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5">
+              <button onclick="selectScenario('C')" id="scen-btn-C" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5 btn-tactile">
                 <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">C</span>
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
@@ -889,7 +1191,7 @@
                 </div>
               </button>
 
-              <button onclick="selectScenario('D')" id="scen-btn-D" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5">
+              <button onclick="selectScenario('D')" id="scen-btn-D" class="scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5 btn-tactile">
                 <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">D</span>
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
@@ -903,7 +1205,7 @@
           </div>
 
           <!-- Stop - Look - Speak Scaffold Interactive Tool -->
-          <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-5">
+          <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 shadow-card-float border border-slate-200 space-y-5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
               <div>
                 <span class="text-xs sm:text-sm font-black text-purple-700 bg-purple-100 px-3.5 py-1 rounded-full">
@@ -925,7 +1227,7 @@
                   </span>
                   <button onclick="speakText('步驟 1：停，情緒與表情覺察。' + document.getElementById('scen-emotion-desc').innerText)" class="w-6 h-6 rounded-full bg-rose-200 text-rose-800 text-xs flex items-center justify-center" title="朗讀步驟1"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <span id="scen-emotion-tag" class="text-xs sm:text-sm font-black text-rose-700 bg-white px-3 py-1 rounded-lg border border-rose-200">
+                <span id="scen-emotion-tag" class="text-xs sm:text-sm font-black text-rose-700 bg-white px-3 py-1 rounded-lg border border-rose-200 shadow-xs">
                   難過 / 委屈
                 </span>
               </div>
@@ -943,7 +1245,7 @@
                   </span>
                   <button onclick="speakText('步驟 2：看，意圖與界限判斷。' + document.getElementById('scen-judge-desc').innerText)" class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 text-xs flex items-center justify-center" title="朗讀步驟2"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <span id="scen-type-tag" class="text-xs sm:text-sm font-black text-amber-800 bg-white px-3 py-1 rounded-lg border border-amber-200">
+                <span id="scen-type-tag" class="text-xs sm:text-sm font-black text-amber-800 bg-white px-3 py-1 rounded-lg border border-amber-200 shadow-xs">
                   性別嘲弄 / 微歧視
                 </span>
               </div>
@@ -968,21 +1270,21 @@
 
               <!-- Sentence block representation -->
               <div class="space-y-2.5 text-sm sm:text-base font-bold text-slate-800">
-                <div class="p-3 bg-white rounded-xl border border-emerald-200 shadow-xs flex items-center justify-between gap-3">
+                <div class="p-3 bg-white rounded-xl border border-emerald-200 shadow-xs flex items-center justify-between gap-3 hover:border-emerald-400 transition">
                   <div class="flex items-start gap-2.5">
                     <span class="bg-emerald-500 text-white text-xs px-2.5 py-0.5 rounded-full shrink-0 mt-0.5 font-black">明確拒絕</span>
                     <span id="scen-speak-reject" class="text-emerald-950 font-black">「請你停止，男孩子想哭也是很正常的情緒釋放。」</span>
                   </div>
                   <button onclick="speakText(document.getElementById('scen-speak-reject').innerText)" class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 text-xs flex items-center justify-center shrink-0" title="朗讀拒絕句"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <div class="p-3 bg-white rounded-xl border border-indigo-200 shadow-xs flex items-center justify-between gap-3">
+                <div class="p-3 bg-white rounded-xl border border-indigo-200 shadow-xs flex items-center justify-between gap-3 hover:border-indigo-400 transition">
                   <div class="flex items-start gap-2.5">
                     <span class="bg-indigo-500 text-white text-xs px-2.5 py-0.5 rounded-full shrink-0 mt-0.5 font-black">同儕倡導</span>
                     <span id="scen-speak-advocate" class="text-indigo-950 font-black">「每個人都有哭泣的權利，請不要用性別來取笑同學。」</span>
                   </div>
                   <button onclick="speakText(document.getElementById('scen-speak-advocate').innerText)" class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-800 text-xs flex items-center justify-center shrink-0" title="朗讀倡導句"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <div class="p-3 bg-white rounded-xl border border-rose-200 shadow-xs flex items-center justify-between gap-3">
+                <div class="p-3 bg-white rounded-xl border border-rose-200 shadow-xs flex items-center justify-between gap-3 hover:border-rose-400 transition">
                   <div class="flex items-start gap-2.5">
                     <span class="bg-rose-500 text-white text-xs px-2.5 py-0.5 rounded-full shrink-0 mt-0.5 font-black">尋求協助</span>
                     <span id="scen-speak-help" class="text-rose-950 font-black">「如果對方不理會並持續嘲笑，轉身找老師或輔導室尋求協助！」</span>
@@ -1004,32 +1306,40 @@
 
       <!-- SUB-TOOL 2.3: 班級友善人際天平公約樹 -->
       <div id="p2-tool-scale" class="hidden space-y-6">
-        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-6">
-          <div class="max-w-3xl space-y-2">
-            <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-800 bg-amber-100 px-3.5 py-1.5 rounded-full">
-              <i class="fa-solid fa-tree"></i> 班級共融文化營造
+        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="max-w-3xl space-y-1">
+              <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-800 bg-amber-100 px-3.5 py-1 rounded-full">
+                <i class="fa-solid fa-tree"></i> 班級共融文化營造
+              </div>
+              <div class="flex items-center gap-3">
+                <h3 class="text-xl sm:text-2xl font-black text-slate-800">
+                  友善人際天平展示架 & 行動承諾木吊牌
+                </h3>
+                <button onclick="speakText('友善人際天平展示架與行動承諾木吊牌。當我們多一份包容與消除偏見，天平便會偏向溫暖的正義！請挑選或自行寫下友善承諾木吊牌，掛在班級天平樹上。')" class="tts-speaker-btn tts-speaker-btn-amber" title="朗讀天平介紹"><i class="fa-solid fa-volume-high"></i></button>
+              </div>
+              <p class="text-base text-slate-600 font-medium">
+                當我們多一份包容與消除偏見，天平便會偏向溫暖的正義！請挑選或自行寫下「友善承諾木吊牌」，掛在班級天平樹上。
+              </p>
             </div>
-            <div class="flex items-center gap-3">
-              <h3 class="text-xl sm:text-2xl font-black text-slate-800">
-                友善人際天平展示架 & 行動承諾木吊牌
-              </h3>
-              <button onclick="speakText('友善人際天平展示架與行動承諾木吊牌。當我們多一份包容與消除偏見，天平便會偏向溫暖的正義！請挑選或自行寫下友善承諾木吊牌，掛在班級天平樹上。')" class="tts-speaker-btn tts-speaker-btn-amber" title="朗讀天平介紹"><i class="fa-solid fa-volume-high"></i></button>
-            </div>
-            <p class="text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
-              當我們多一份包容與消除偏見，天平便會偏向溫暖的正義！請挑選或自行寫下「友善承諾木吊牌」，掛在班級天平樹上。
-            </p>
+            
+            <!-- Certificate Print Trigger -->
+            <button onclick="openCertificateModal()" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-sm shadow-md flex items-center gap-2 shrink-0 btn-tactile">
+              <i class="fa-solid fa-award text-base text-yellow-200"></i>
+              <span>產生全班公約證書</span>
+            </button>
           </div>
 
           <!-- Visual Balance Scale Simulation -->
-          <div class="bg-gradient-to-b from-slate-50 to-indigo-50/30 rounded-3xl p-6 border border-slate-200 flex flex-col items-center justify-center">
+          <div class="bg-gradient-to-b from-slate-50 to-indigo-50/40 rounded-3xl p-6 border border-slate-200 flex flex-col items-center justify-center relative overflow-hidden">
             
             <!-- Scale Meter Header -->
-            <div class="w-full flex items-center justify-between max-w-lg mb-4 text-xs sm:text-sm font-black">
+            <div class="w-full flex items-center justify-between max-w-lg mb-2 text-xs sm:text-sm font-black">
               <div class="flex items-center gap-1.5 text-rose-600">
                 <i class="fa-solid fa-triangle-exclamation"></i> 刻板與偏見負擔
                 <button onclick="speakText('左側：刻板與偏見負擔')" class="w-5 h-5 rounded-full bg-rose-100 text-rose-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <span id="scale-balance-status" class="text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full">天平狀態：平衡融洽</span>
+              <span id="scale-balance-status" class="text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full shadow-xs">天平狀態：友善包容充沛！</span>
               <div class="flex items-center gap-1.5 text-teal-700">
                 <i class="fa-solid fa-heart-circle-check"></i> 友善與包容力量
                 <button onclick="speakText('右側：友善與包容承諾力量')" class="w-5 h-5 rounded-full bg-teal-100 text-teal-800 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
@@ -1037,35 +1347,38 @@
             </div>
 
             <!-- SVG Animated Balance Scale -->
-            <div class="w-80 sm:w-[420px] h-52 relative">
-              <svg id="balance-svg" viewBox="0 0 300 200" class="w-full h-full">
+            <div class="w-80 sm:w-[460px] h-56 relative flex items-center justify-center">
+              <svg id="balance-svg" viewBox="0 0 320 220" class="w-full h-full drop-shadow">
                 <!-- Base stand -->
-                <polygon points="135,190 165,190 155,100 145,100" fill="#64748b" />
-                <rect x="110" y="185" width="80" height="10" rx="3" fill="#475569" />
-                <!-- Fulcrum point -->
-                <circle cx="150" cy="98" r="8" fill="#334155" />
+                <polygon points="145,205 175,205 165,110 155,110" fill="#64748b" />
+                <rect x="120" y="200" width="80" height="12" rx="4" fill="#334155" />
+                <!-- Center pivot pin -->
+                <circle cx="160" cy="108" r="9" fill="#1e293b" />
+                <circle cx="160" cy="108" r="4" fill="#f8fafc" />
 
                 <!-- Rotating Beam -->
-                <g id="scale-beam" class="transition-transform duration-700 origin-[150px_98px]" transform="rotate(-6 150 98)">
-                  <!-- Beam horizontal -->
-                  <rect x="30" y="95" width="240" height="6" rx="3" fill="#d97706" />
+                <g id="scale-beam" class="transition-transform duration-700 origin-[160px_108px]" transform="rotate(-8 160 108)">
+                  <!-- Beam horizontal wood -->
+                  <rect x="35" y="104" width="250" height="8" rx="4" fill="#b45309" stroke="#78350f" stroke-width="1.5" />
                   
                   <!-- Left Tray (Prejudice) -->
-                  <line x1="50" y1="98" x2="30" y2="140" stroke="#92400e" stroke-width="2" />
-                  <line x1="50" y1="98" x2="70" y2="140" stroke="#92400e" stroke-width="2" />
-                  <path d="M 20,140 Q 50,155 80,140 Z" fill="#b45309" />
-                  <text id="tray-prejudice-text" x="50" y="152" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold">偏見 1</text>
+                  <line x1="55" y1="108" x2="35" y2="155" stroke="#92400e" stroke-width="2.5" />
+                  <line x1="55" y1="108" x2="75" y2="155" stroke="#92400e" stroke-width="2.5" />
+                  <path d="M 25,155 Q 55,172 85,155 Z" fill="#b45309" stroke="#78350f" stroke-width="1.5" />
+                  <circle cx="55" cy="150" r="14" fill="#ef4444" opacity="0.8" />
+                  <text id="tray-prejudice-text" x="55" y="154" font-size="10" text-anchor="middle" fill="#fff" font-weight="900">偏見 1</text>
 
                   <!-- Right Tray (Kindness / Promises) -->
-                  <line x1="250" y1="98" x2="230" y2="140" stroke="#047857" stroke-width="2" />
-                  <line x1="250" y1="98" x2="270" y2="140" stroke="#047857" stroke-width="2" />
-                  <path d="M 220,140 Q 250,155 280,140 Z" fill="#059669" />
-                  <text id="tray-kindness-text" x="250" y="152" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold">承諾 4</text>
+                  <line x1="265" y1="108" x2="245" y2="155" stroke="#047857" stroke-width="2.5" />
+                  <line x1="265" y1="108" x2="285" y2="155" stroke="#047857" stroke-width="2.5" />
+                  <path d="M 235,155 Q 265,172 295,155 Z" fill="#059669" stroke="#047857" stroke-width="1.5" />
+                  <circle cx="265" cy="150" r="16" fill="#10b981" />
+                  <text id="tray-kindness-text" x="265" y="154" font-size="11" text-anchor="middle" fill="#fff" font-weight="900">承諾 4</text>
                 </g>
               </svg>
             </div>
             
-            <p class="text-sm font-bold text-slate-600 mt-2">
+            <p id="scale-message" class="text-sm font-bold text-slate-700 mt-1">
               目前友善承諾力量充足，天平穩穩向「互相尊重與融合」傾斜！
             </p>
           </div>
@@ -1075,9 +1388,9 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <i class="fa-solid fa-scroll text-amber-600 text-base"></i> 全班已懸掛的友善承諾吊牌：
+                  <i class="fa-solid fa-tree text-emerald-600 text-base"></i> 班級天平樹上懸掛的友善承諾木吊牌：
                 </span>
-                <button onclick="speakText('全班已懸掛的友善承諾吊牌')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
+                <button onclick="speakText('班級天平樹上懸掛的友善承諾木吊牌')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
               <span id="tags-count-badge" class="text-sm bg-indigo-100 text-indigo-700 font-black px-3 py-1 rounded-full">4 枚吊牌</span>
             </div>
@@ -1088,7 +1401,7 @@
           </div>
 
           <!-- Add New Covenant Tag Input -->
-          <div class="bg-amber-50/75 border border-amber-200 rounded-3xl p-5 sm:p-6 space-y-3.5">
+          <div class="bg-amber-50/80 border border-amber-200 rounded-3xl p-5 sm:p-6 space-y-3.5">
             <div class="flex items-center justify-between">
               <h4 class="text-base font-black text-amber-950 flex items-center gap-2">
                 <i class="fa-solid fa-plus-circle text-amber-600 text-lg"></i>
@@ -1097,8 +1410,9 @@
               <button onclick="speakText('為班級天平掛上新的承諾木吊牌。請在輸入框寫下承諾，或挑選下方快速承諾！')" class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 text-xs flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
             </div>
             <div class="flex flex-col sm:flex-row gap-2.5">
+              <input type="text" id="new-covenant-author" placeholder="承諾人 (例: 3年1班小明)" class="w-full sm:w-48 bg-white border border-amber-300 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium" maxlength="15">
               <input type="text" id="new-covenant-input" placeholder="例如：我會主動邀請不同特質的同學一起分組玩遊戲..." class="flex-1 bg-white border border-amber-300 rounded-2xl px-4 py-3 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium" maxlength="35">
-              <button onclick="addNewCovenantTag()" class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base shadow transition flex items-center justify-center gap-2 shrink-0">
+              <button onclick="addNewCovenantTag()" class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm sm:text-base shadow transition flex items-center justify-center gap-2 shrink-0 btn-tactile">
                 <i class="fa-solid fa-hammer"></i>
                 <span>掛上天平</span>
               </button>
@@ -1108,7 +1422,8 @@
               <span class="text-xs sm:text-sm font-black text-amber-900">快速挑選：</span>
               <button onclick="fillPresetTag('不隨意拿特教同學的身體特徵開玩笑')" class="text-xs sm:text-sm font-bold bg-white border border-amber-200 text-slate-700 hover:border-amber-400 px-3 py-1.5 rounded-xl transition">不拿身體特徵開玩笑</button>
               <button onclick="fillPresetTag('觸碰或借文具前，先詢問並尊重對方的拒絕')" class="text-xs sm:text-sm font-bold bg-white border border-amber-200 text-slate-700 hover:border-amber-400 px-3 py-1.5 rounded-xl transition">先詢問並尊重拒絕</button>
-              <button onclick="fillPresetTag('支持每個人自由喜歡任何顏色與運動')" class="text-xs sm:text-sm font-bold bg-white border border-amber-200 text-slate-700 hover:border-amber-400 px-3 py-1.5 rounded-xl transition">支持自由喜好</button>
+              <button onclick="fillPresetTag('支持每個人自由喜歡任何顏色、髮型與運動')" class="text-xs sm:text-sm font-bold bg-white border border-amber-200 text-slate-700 hover:border-amber-400 px-3 py-1.5 rounded-xl transition">支持多元興趣自由</button>
+              <button onclick="fillPresetTag('看見同學被嘲弄時，挺身發聲尋求協助')" class="text-xs sm:text-sm font-bold bg-white border border-amber-200 text-slate-700 hover:border-amber-400 px-3 py-1.5 rounded-xl transition">挺身發聲反霸凌</button>
             </div>
           </div>
 
@@ -1123,10 +1438,10 @@
     <section id="module-doc" class="hidden space-y-6">
       
       <!-- Curriculum Alignment Intro -->
-      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-5">
-        <div class="flex items-center justify-between">
+      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl font-bold">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl font-bold shadow-xs">
               <i class="fa-solid fa-graduation-cap"></i>
             </div>
             <div>
@@ -1134,11 +1449,21 @@
               <p class="text-sm text-slate-500 font-bold">落實普特融合、通用設計 (UDL) 與性別平等教育核心素養</p>
             </div>
           </div>
-          <button onclick="speakText('十二年國教特殊教育課程綱要與議題融入對照表。落實普特融合、通用設計與性別平等教育核心素養。')" class="tts-speaker-btn tts-speaker-btn-emerald" title="朗讀綱要說明"><i class="fa-solid fa-volume-high"></i></button>
+          <button onclick="speakText('十二年國教特殊教育課程綱要與議題融入對照表。落實普特融合、通用設計與性別平等教育核心素養。')" class="tts-speaker-btn tts-speaker-btn-emerald self-start sm:self-auto" title="朗讀綱要說明"><i class="fa-solid fa-volume-high"></i></button>
+        </div>
+
+        <!-- Filter category tags -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs sm:text-sm font-black text-slate-600 mr-1"><i class="fa-solid fa-filter"></i> 領域篩選：</span>
+          <button onclick="filterCurriculum('all')" id="cur-filter-all" class="cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-indigo-600 text-white shadow-xs">全部顯示</button>
+          <button onclick="filterCurriculum('life')" id="cur-filter-life" class="cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200">生活管理</button>
+          <button onclick="filterCurriculum('social')" id="cur-filter-social" class="cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200">社會技巧</button>
+          <button onclick="filterCurriculum('aac')" id="cur-filter-aac" class="cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200">溝通訓練 (AAC)</button>
+          <button onclick="filterCurriculum('strategy')" id="cur-filter-strategy" class="cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200">學習策略</button>
         </div>
 
         <!-- Plan 1 Curriculum Specs Grid -->
-        <div class="border border-rose-200 rounded-2xl overflow-hidden">
+        <div id="cur-card-plan1" class="border border-rose-200 rounded-2xl overflow-hidden shadow-xs">
           <div class="bg-rose-50 px-5 py-3 font-black text-sm sm:text-base text-rose-900 border-b border-rose-200 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-star text-rose-500 text-base"></i>
@@ -1147,41 +1472,41 @@
             <button onclick="speakText('方案一基礎版對應特需綱要：生活管理特生2-sP-14，社會技巧特社2-I-12至14，溝通訓練特溝2-sP-2與4-sP-3。')" class="w-6 h-6 rounded-full bg-rose-200 text-rose-800 text-xs flex items-center justify-center" title="朗讀方案一特需綱要"><i class="fa-solid fa-volume-high"></i></button>
           </div>
           <div class="p-5 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 text-sm sm:text-base">
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-life space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-indigo-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-house-chimney-user text-indigo-600"></i> 生活管理：
                 </strong>
                 <button onclick="speakText('生活管理：特生2-sP-14 接受自己的性別氣質，保護自己並尊重他人的身體自主權。特生I-sP-4 身體隱私與界限認識；特生I-sP-5 身體自主權維護。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特生2-sP-14 接受自己的性別氣質，保護自己並尊重他人的身體自主權。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特生I-sP-4 身體隱私與界限的認識與保護；特生I-sP-5 身體自主權的維護與尊重。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-indigo-700 font-bold">特生2-sP-14</span> 接受自己的性別氣質，保護自己並尊重他人的身體自主權。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-indigo-700 font-bold">特生I-sP-4</span> 身體隱私與界限的認識與保護；<span class="text-indigo-700 font-bold">特生I-sP-5</span> 身體自主權的維護與尊重。</p>
             </div>
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-social space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-indigo-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-comments text-indigo-600"></i> 社會技巧：
                 </strong>
                 <button onclick="speakText('社會技巧：特社2-I-12 遵守基本禮儀；特社2-I-13 分辨與因應不適當觸摸或語言；特社2-I-14 尊重身體界限與自主權。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特社2-I-12 與他人相處時遵守基本禮儀；特社2-I-13 分辨與因應不適當觸摸或語言；特社2-I-14 尊重身體界限與自主權。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特社B-I-5 性別互動的基本禮儀。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-indigo-700 font-bold">特社2-I-12</span> 與他人相處時遵守基本禮儀；<span class="text-indigo-700 font-bold">特社2-I-13</span> 分辨與因應不適當觸摸或語言；<span class="text-indigo-700 font-bold">特社2-I-14</span> 尊重身體界限與自主權。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-indigo-700 font-bold">特社B-I-5</span> 性別互動的基本禮儀。</p>
             </div>
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-aac space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-indigo-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-hands-asl-interpreting text-indigo-600"></i> 溝通訓練 (AAC)：
                 </strong>
                 <button onclick="speakText('溝通訓練：特溝2-sP-2 發出清楚明確訊息；特溝4-sP-3 接納他人溝通形式。特溝D-sP-3 圖像線條圖；特溝A-sP-4 溝通意義手勢。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特溝2-sP-2 發出清楚明確訊息；特溝4-sP-3 接納他人的溝通形式。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特溝D-sP-3 符合溝通需求之圖像或線條圖；特溝A-sP-4 有溝通意義的手勢。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-indigo-700 font-bold">特溝2-sP-2</span> 發出清楚明確訊息；<span class="text-indigo-700 font-bold">特溝4-sP-3</span> 接納他人的溝通形式。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-indigo-700 font-bold">特溝D-sP-3</span> 符合溝通需求之圖像或線條圖；<span class="text-indigo-700 font-bold">特溝A-sP-4</span> 有溝通意義的手勢。</p>
             </div>
           </div>
         </div>
 
         <!-- Plan 2 Curriculum Specs Grid -->
-        <div class="border border-purple-200 rounded-2xl overflow-hidden">
+        <div id="cur-card-plan2" class="border border-purple-200 rounded-2xl overflow-hidden shadow-xs">
           <div class="bg-purple-50 px-5 py-3 font-black text-sm sm:text-base text-purple-900 border-b border-purple-200 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-bolt text-purple-600 text-base"></i>
@@ -1190,35 +1515,35 @@
             <button onclick="speakText('方案二進階版對應特需綱要：社會技巧特社2-II-1至16，生活管理特生4-sP-1與2-sP-15，學習策略特學1-II-5與8。')" class="w-6 h-6 rounded-full bg-purple-200 text-purple-800 text-xs flex items-center justify-center" title="朗讀方案二特需綱要"><i class="fa-solid fa-volume-high"></i></button>
           </div>
           <div class="p-5 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 text-sm sm:text-base">
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-social space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-purple-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-users text-purple-600"></i> 社會技巧：
                 </strong>
                 <button onclick="speakText('社會技巧：特社2-II-1 解讀口語非口語情緒；特社2-III-5 明瞭每個人獨特性；特社2-III-16 平等尊重對待各性別。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特社2-II-1 解讀口語與非口語溝通情緒；特社2-III-5 明瞭每個人獨特性；特社2-III-16 平等尊重對待各性別。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特社B-II-1 訊息解讀技巧；特社B-III-5 多元性別互動與自主。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-purple-700 font-bold">特社2-II-1</span> 解讀口語與非口語溝通情緒；<span class="text-purple-700 font-bold">特社2-III-5</span> 明瞭每個人獨特性；<span class="text-purple-700 font-bold">特社2-III-16</span> 平等尊重對待各性別。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-purple-700 font-bold">特社B-II-1</span> 訊息解讀技巧；<span class="text-purple-700 font-bold">特社B-III-5</span> 多元性別互動與自主。</p>
             </div>
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-life space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-purple-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-shield text-purple-600"></i> 生活管理：
                 </strong>
                 <button onclick="speakText('生活管理：特生4-sP-1 認識接受特質；特生2-sP-15 辨識暴力、性騷擾霸凌自保求助。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特生4-sP-1 認識並接受特質；特生2-sP-15 辨識暴力、性騷擾、霸凌並能自保及求助。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特生I-sP-6 性騷擾、性侵害與性霸凌認識；特生M-sP-2 自我覺察。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-purple-700 font-bold">特生4-sP-1</span> 認識並接受特質；<span class="text-purple-700 font-bold">特生2-sP-15</span> 辨識暴力、性騷擾、霸凌並能自保及求助。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-purple-700 font-bold">特生I-sP-6</span> 性騷擾、性侵害與性霸凌認識；<span class="text-purple-700 font-bold">特生M-sP-2</span> 自我覺察。</p>
             </div>
-            <div class="space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="cur-item-strategy space-y-2 p-4 rounded-xl bg-slate-50 border border-slate-100">
               <div class="flex items-center justify-between">
                 <strong class="text-purple-900 font-black text-base flex items-center gap-1.5">
                   <i class="fa-solid fa-diagram-project text-purple-600"></i> 學習策略：
                 </strong>
                 <button onclick="speakText('學習策略：特學1-II-5 心智圖組織圖流程圖；特學1-II-8 將學習內容與經歷連結。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
               </div>
-              <p class="leading-relaxed"><strong>學習表現：</strong>特學1-II-5 製作組織圖或流程圖；特學1-II-8 將學習內容與自身經驗產生連結。</p>
-              <p class="leading-relaxed"><strong>學習內容：</strong>特學A-II-4 心智圖、組織圖或流程圖（拆彈三步驟尺規）。</p>
+              <p class="leading-relaxed"><strong>學習表現：</strong><span class="text-purple-700 font-bold">特學1-II-5</span> 製作組織圖或流程圖；<span class="text-purple-700 font-bold">特學1-II-8</span> 將學習內容與自身經驗產生連結。</p>
+              <p class="leading-relaxed"><strong>學習內容：</strong><span class="text-purple-700 font-bold">特學A-II-4</span> 心智圖、組織圖或流程圖（拆彈三步驟尺規）。</p>
             </div>
           </div>
         </div>
@@ -1226,11 +1551,11 @@
       </div>
 
       <!-- Highlights Table -->
-      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200 space-y-4">
+      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-card-float border border-slate-200 space-y-4">
         <div class="flex items-center justify-between">
           <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-center gap-2">
             <i class="fa-solid fa-trophy text-amber-500"></i>
-            <span>亮點對照表</span>
+            <span>三大教學亮點評審指標對照表</span>
           </h3>
           <button onclick="speakText('亮點對照表，包含特需綱要扣合度、普特融合雙向性、以及輔助科技與通用設計三個指標。')" class="tts-speaker-btn tts-speaker-btn-amber" title="朗讀亮點表格說明"><i class="fa-solid fa-volume-high"></i></button>
         </div>
@@ -1239,16 +1564,16 @@
           <table class="w-full text-left text-sm sm:text-base border border-slate-200 rounded-2xl overflow-hidden">
             <thead class="bg-slate-100 text-slate-800 font-black">
               <tr>
-                <th class="p-4 border-b border-r border-slate-200 w-1/4">分類</th>
+                <th class="p-4 border-b border-r border-slate-200 w-1/4">評審關鍵規準</th>
                 <th class="p-4 border-b border-r border-slate-200 w-3/8 text-rose-900 bg-rose-50/60">基礎版（低年級：身體界限探索盒）</th>
                 <th class="p-4 border-b border-slate-200 w-3/8 text-purple-900 bg-purple-50/60">進階版（中高年級：多元密碼破譯戰）</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200 leading-relaxed text-slate-800">
+            <tbody class="divide-y divide-slate-200 leading-relaxed text-slate-800 font-medium">
               <tr>
                 <td class="p-4 font-black bg-slate-50/70 border-r border-slate-200">
                   <div class="flex items-center justify-between">
-                    <span>特需綱要扣合度</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-bullseye text-indigo-600"></i> 特需綱要扣合度</span>
                     <button onclick="speakText('特需綱要扣合度。基礎版緊扣低年級生活管理與社會技巧第一階段，著重基本身體自主權與泳衣覆蓋界限。進階版呼應社會技巧二、三階段與自我覺察，著重訊息解讀、情境辨識與偏見消除。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                   </div>
                 </td>
@@ -1262,21 +1587,21 @@
               <tr>
                 <td class="p-4 font-black bg-slate-50/70 border-r border-slate-200">
                   <div class="flex items-center justify-between">
-                    <span>普特融合雙向性</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-arrows text-rose-600"></i> 普特融合雙向性</span>
                     <button onclick="speakText('普特融合雙向性。基礎版由普特同儕共同建立觸碰前先詢問、尊重拒絕的規則，非單方面規訓特教生；普通生學會不以好意隨意拉扯抱抱。進階版普通生學習消除性別與身障雙重刻板印象；特教生學習情境解讀與自我倡導，彼此互為守護防線。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                   </div>
                 </td>
-                <td class="p-4 border-r border-slate-200 text-rose-950 bg-rose-50/20 font-medium">
+                <td class="p-4 border-r border-slate-200 text-rose-950 bg-rose-50/20">
                   普特同儕共同建立「觸碰前先詢問、尊重拒絕」的規則，非單方面規訓特教生；普通生學會不以好意隨意拉扯抱抱。
                 </td>
-                <td class="p-4 text-purple-950 bg-purple-50/20 font-medium">
+                <td class="p-4 text-purple-950 bg-purple-50/20">
                   普通生學習消除性別與身障雙重刻板印象；特教生學習情境解讀與自我倡導，彼此互為守護防線。
                 </td>
               </tr>
               <tr>
                 <td class="p-4 font-black bg-slate-50/70 border-r border-slate-200">
                   <div class="flex items-center justify-between">
-                    <span>輔助科技與通用設計 (UDL)</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-universal-access text-teal-600"></i> 輔助科技與通用設計 (UDL)</span>
                     <button onclick="speakText('輔助科技與通用設計。基礎版結合同心圓地墊、磁吸貼片、高對比顏色及簡易AAC雙面發聲鈕，具多感官輸入與輸出。進階版採用結構化思維流程圖、視覺化話術積木尺規，降低抽象概念思考門檻，便於角色扮演練習。')" class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
                   </div>
                 </td>
@@ -1296,41 +1621,49 @@
 
   </main>
 
-  <!-- Guide Modal -->
+  <!-- ========================================================================= -->
+  <!-- MODALS & ACCESSIBILITY DIALOGS                                            -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. Teacher Guide Modal -->
   <div id="guide-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-100 text-sm sm:text-base">
-      <div class="flex items-center justify-between">
+    <div class="bg-white max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-100 text-sm sm:text-base max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
           <i class="fa-solid fa-chalkboard-user text-indigo-600"></i>
           <span>普特融合互動教學系統使用手冊</span>
         </h3>
-        <button onclick="closeQuickGuideModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+        <button onclick="closeQuickGuideModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
       <div class="text-slate-700 space-y-3 leading-relaxed font-medium">
         <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 space-y-1">
-          <strong class="text-indigo-900 block font-black text-base mb-1">💡 方案一（低年級）：</strong>
+          <strong class="text-indigo-900 block font-black text-base mb-1">💡 方案一（低年級：身體界限小星球）：</strong>
           1. 點選布偶身上紅黃綠部位，即時查看界限解說與語音。<br>
-          2. 使用 AAC 雙面牌進行發聲角色扮演演練。<br>
-          3. 切換「同心圓地墊」體驗人際社交距離。
+          2. 可切換 4 位不同特質同伴（含輪椅小宇），穿脫泳裝觀察隱私處。<br>
+          3. 使用 AAC 雙面牌進行發聲角色扮演演練。<br>
+          4. 切換「同心圓地墊」體驗人際社交距離漫步。
         </div>
         <div class="p-4 rounded-2xl bg-purple-50 border border-purple-100 space-y-1">
-          <strong class="text-purple-900 block font-black text-base mb-1">💡 方案二（中高年級）：</strong>
-          1. 按住特質卡片拖曳分類，打破刻板印象。<br>
+          <strong class="text-purple-900 block font-black text-base mb-1">💡 方案二（中高年級：多元密碼破譯戰）：</strong>
+          1. 按住特質卡片拖曳分類，打破性別與身障雙重刻板印象。<br>
           2. 點選 4 種校園情境，循著「停、看、說」鷹架積木組裝應對句型。<br>
-          3. 在友善天平掛上自己的承諾木吊牌。
+          3. 在友善天平掛上自己的承諾木吊牌，並可列印全班公約證書！
+        </div>
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
+          <i class="fa-solid fa-universal-access"></i> 本教材全面支持 UDL 通用設計，包含語音朗讀、多感官音效、字體縮放與高對比模式。
         </div>
       </div>
-      <button onclick="closeQuickGuideModal()" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base transition">
+      <button onclick="closeQuickGuideModal()" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base transition shadow-md btn-tactile">
         我知道了，開始探索！
       </button>
     </div>
   </div>
 
-  <!-- Accessibility & Voice Settings Modal -->
+  <!-- 2. Accessibility & Voice Settings Modal -->
   <div id="settings-modal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white max-w-xl w-full rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6 border border-slate-100 max-h-[92vh] overflow-y-auto">
+    <div class="bg-white max-w-xl w-full rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 border border-slate-100 max-h-[92vh] overflow-y-auto">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
@@ -1349,7 +1682,7 @@
       </div>
 
       <!-- Section 1: Font Size Scaling -->
-      <div class="space-y-3">
+      <div class="space-y-2.5">
         <div class="flex items-center justify-between">
           <label class="text-base font-black text-slate-800 flex items-center gap-2">
             <i class="fa-solid fa-text-height text-indigo-600"></i>
@@ -1360,19 +1693,19 @@
           </span>
         </div>
         <div class="grid grid-cols-4 gap-2.5">
-          <button onclick="setFontScale('standard')" id="font-scale-standard" class="font-scale-btn py-2.5 px-2 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-indigo-900 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition">
+          <button onclick="setFontScale('standard')" id="font-scale-standard" class="font-scale-btn py-2.5 px-2 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-indigo-900 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile">
             <span class="text-sm font-bold">A</span>
             <span>標準 (100%)</span>
           </button>
-          <button onclick="setFontScale('large')" id="font-scale-large" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition">
+          <button onclick="setFontScale('large')" id="font-scale-large" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile">
             <span class="text-base font-bold">A+</span>
             <span>放大 (115%)</span>
           </button>
-          <button onclick="setFontScale('xlarge')" id="font-scale-xlarge" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition">
+          <button onclick="setFontScale('xlarge')" id="font-scale-xlarge" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile">
             <span class="text-lg font-bold">A++</span>
             <span>特大 (130%)</span>
           </button>
-          <button onclick="setFontScale('huge')" id="font-scale-huge" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition">
+          <button onclick="setFontScale('huge')" id="font-scale-huge" class="font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile">
             <span class="text-xl font-bold">A+++</span>
             <span>超大 (145%)</span>
           </button>
@@ -1381,7 +1714,7 @@
       </div>
 
       <!-- Section 2: Speech Rate -->
-      <div class="space-y-3 border-t border-slate-100 pt-4">
+      <div class="space-y-2.5 border-t border-slate-100 pt-3.5">
         <div class="flex items-center justify-between">
           <label for="speech-rate-slider" class="text-base font-black text-slate-800 flex items-center gap-2">
             <i class="fa-solid fa-gauge-high text-amber-500"></i>
@@ -1404,7 +1737,7 @@
       </div>
 
       <!-- Section 3: Voice Selection & Pitch / Timbre -->
-      <div class="space-y-3.5 border-t border-slate-100 pt-4">
+      <div class="space-y-3 border-t border-slate-100 pt-3.5">
         <div class="flex items-center justify-between">
           <label for="voice-select" class="text-base font-black text-slate-800 flex items-center gap-2">
             <i class="fa-solid fa-microphone-lines text-rose-500"></i>
@@ -1412,12 +1745,12 @@
           </label>
           <span class="text-xs font-bold text-slate-400">系統中文發音</span>
         </div>
-        <select id="voice-select" onchange="updateSelectedVoice(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-sm sm:text-base font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-400">
+        <select id="voice-select" onchange="updateSelectedVoice(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-2.5 text-sm sm:text-base font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-400">
           <option value="">載入語音音色中...</option>
         </select>
 
         <!-- Pitch control -->
-        <div class="space-y-2 pt-1">
+        <div class="space-y-1.5 pt-1">
           <div class="flex items-center justify-between">
             <label for="speech-pitch-slider" class="text-sm font-black text-slate-700 flex items-center gap-1.5">
               <i class="fa-solid fa-music text-purple-500"></i>
@@ -1437,17 +1770,83 @@
       </div>
 
       <!-- Test and Save actions -->
-      <div class="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-center gap-3">
-        <button onclick="testVoiceSettings()" class="w-full sm:w-1/2 py-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-sm sm:text-base flex items-center justify-center gap-2 transition">
+      <div class="border-t border-slate-100 pt-3.5 flex flex-col sm:flex-row items-center gap-3">
+        <button onclick="testVoiceSettings()" class="w-full sm:w-1/2 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-sm sm:text-base flex items-center justify-center gap-2 transition btn-tactile">
           <i class="fa-solid fa-volume-high"></i>
           <span>試聽當前語音效果</span>
         </button>
-        <button onclick="closeSettingsModal()" class="w-full sm:w-1/2 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm transition">
+        <button onclick="closeSettingsModal()" class="w-full sm:w-1/2 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm transition btn-tactile">
           <i class="fa-solid fa-check"></i>
           <span>確認儲存設定</span>
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- 3. Add Custom Trait Modal -->
+  <div id="add-trait-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-purple-600"></i>
+          <span>自訂課堂特質卡牌</span>
+        </h3>
+        <button onclick="closeAddTraitModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs font-black text-slate-700 mb-1 block">特質名稱（例如：熱愛跳街舞、對聲音敏感）：</label>
+          <input type="text" id="custom-trait-text" placeholder="請輸入特質或興趣..." class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500" maxlength="20">
+        </div>
+        <div>
+          <label class="text-xs font-black text-slate-700 mb-1 block">引導解讀金句（為什麼所有人都可以擁有？）：</label>
+          <textarea id="custom-trait-insight" rows="2" placeholder="例如：無論男女與身體狀況，都可以享受音樂與律動的快樂！" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pt-2">
+        <button onclick="closeAddTraitModal()" class="w-1/2 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm">取消</button>
+        <button onclick="submitCustomTrait()" class="w-1/2 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-black text-sm shadow-md btn-tactile">加入牌堆</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Class Covenant Certificate Printable Modal -->
+  <div id="certificate-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-amber-50 max-w-2xl w-full rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-amber-400 relative overflow-hidden space-y-4">
+      <div class="no-print absolute top-4 right-4 flex items-center gap-2">
+        <button onclick="window.print()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-sm hover:bg-indigo-700 transition">
+          <i class="fa-solid fa-print"></i> 列印獎狀
+        </button>
+        <button onclick="closeCertificateModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Certificate Content Frame -->
+      <div class="border-2 border-dashed border-amber-300 rounded-2xl p-6 bg-white/90 text-center space-y-4">
+        <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-3xl mx-auto shadow-sm">
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-amber-950 font-kids tracking-wide">
+          班級友善人際天平公約證書
+        </h2>
+        <p class="text-sm text-slate-600 font-bold">
+          在我們這個班級裡，每個人都擁有屬於自己的身體小星球。我們承諾互相尊重、消除偏見、攜手守護校園平權！
+        </p>
+
+        <!-- Dynamic List of Promises -->
+        <div class="text-left bg-amber-50/70 p-4 rounded-xl border border-amber-200 text-xs sm:text-sm space-y-2 font-bold text-slate-800" id="certificate-promises-list">
+          <!-- Injected via JS -->
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-amber-200 text-xs sm:text-sm text-slate-600 font-bold">
+          <div>守護班級：<span id="cert-class-name" class="font-black text-slate-800 underline">普特共學班全體同學</span></div>
+          <div>約定日期：<span id="cert-date" class="font-black text-slate-800">2026 年 10 月</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1460,35 +1859,84 @@
   </div>
 
   <script>
-    /* Tone.js Sound FX Generator */
+    /* ========================================================================= */
+    /* AUDIO SYNTHESIZER & FEEDBACK (Tone.js with Web Audio Fallback)             */
+    /* ========================================================================= */
     let synth = null;
     let isAudioEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
 
     function initAudio() {
       if (!synth && typeof Tone !== 'undefined') {
-        synth = new Tone.PolySynth(Tone.Synth).toDestination();
-        synth.volume.value = -6;
+        try {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0.2, release: 0.5 }
+          }).toDestination();
+          synth.volume.value = -4;
+        } catch(e) {
+          console.warn('Tone.js init fallback', e);
+        }
+      }
+    }
+
+    function fallbackBeep(freq, duration, type = 'sine') {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        console.warn('Audio fallback error', e);
       }
     }
 
     function playSound(type) {
       if (!isAudioEnabled) return;
       try {
-        if (Tone.context.state !== 'running') {
+        if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state !== 'running') {
           Tone.start();
         }
         initAudio();
-        if (type === 'click') {
-          synth.triggerAttackRelease('C5', '16n');
-        } else if (type === 'success') {
-          synth.triggerAttackRelease(['E5', 'G5', 'C6'], '8n');
-        } else if (type === 'alert') {
-          synth.triggerAttackRelease(['G4', 'C4'], '8n');
-        } else if (type === 'pop') {
-          synth.triggerAttackRelease('A5', '32n');
+        if (synth) {
+          if (type === 'click') {
+            synth.triggerAttackRelease('C5', '32n');
+          } else if (type === 'success') {
+            synth.triggerAttackRelease(['E5', 'G5', 'C6'], '16n');
+          } else if (type === 'alert') {
+            synth.triggerAttackRelease(['G4', 'D4'], '16n');
+          } else if (type === 'pop') {
+            synth.triggerAttackRelease('A5', '32n');
+          } else if (type === 'magic') {
+            synth.triggerAttackRelease(['C5', 'E5', 'G5', 'B5', 'C6'], '16n');
+          }
+        } else {
+          // Fallback oscillators
+          if (type === 'click') fallbackBeep(600, 0.05);
+          else if (type === 'success') fallbackBeep(880, 0.15);
+          else if (type === 'alert') fallbackBeep(320, 0.2, 'sawtooth');
+          else if (type === 'pop') fallbackBeep(700, 0.04);
+          else if (type === 'magic') fallbackBeep(1046, 0.25);
         }
       } catch (e) {
-        console.warn('Audio fallback', e);
+        if (type === 'success') fallbackBeep(880, 0.15);
+        else fallbackBeep(600, 0.05);
       }
     }
 
@@ -1510,16 +1958,141 @@
       }
     }
 
-    // Web Speech API Voice synthesis for universal design / low literacy support
+    /* ========================================================================= */
+    /* WEB SPEECH API & VOICE SETTINGS (UDL Multiple Means of Representation)    */
+    /* ========================================================================= */
+    let currentFontScale = 'standard';
+    let userSpeechRate = 0.95;
+    let userSpeechPitch = 1.05;
+    let selectedVoiceURI = '';
+    let availableVoices = [];
+
+    function populateVoiceList() {
+      if (!('speechSynthesis' in window)) return;
+      availableVoices = window.speechSynthesis.getVoices();
+      const select = document.getElementById('voice-select');
+      if (!select) return;
+
+      if (!availableVoices || availableVoices.length === 0) {
+        select.innerHTML = '<option value="">系統預設中文語音</option>';
+        return;
+      }
+
+      const zhVoices = availableVoices.filter(v => v.lang.includes('zh') || v.lang.includes('cmn'));
+      const otherVoices = availableVoices.filter(v => !v.lang.includes('zh') && !v.lang.includes('cmn'));
+      const combined = [...zhVoices, ...otherVoices];
+
+      select.innerHTML = '';
+      combined.forEach((voice, index) => {
+        const opt = document.createElement('option');
+        opt.value = voice.voiceURI;
+        const isZh = voice.lang.includes('zh') || voice.lang.includes('cmn');
+        opt.textContent = `${isZh ? '⭐ ' : ''}${voice.name} (${voice.lang})${voice.default ? ' [預設]' : ''}`;
+        if (voice.voiceURI === selectedVoiceURI || (!selectedVoiceURI && isZh && (voice.lang.includes('TW') || index === 0))) {
+          opt.selected = true;
+          selectedVoiceURI = voice.voiceURI;
+        }
+        select.appendChild(opt);
+      });
+    }
+
     function speakText(text) {
       if (!isAudioEnabled || !('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-TW';
-      utterance.rate = 0.95; // slightly slower for special education clarity
-      utterance.pitch = 1.05;
+      utterance.rate = userSpeechRate;
+      utterance.pitch = userSpeechPitch;
+
+      if (selectedVoiceURI && availableVoices.length > 0) {
+        const targetVoice = availableVoices.find(v => v.voiceURI === selectedVoiceURI);
+        if (targetVoice) {
+          utterance.voice = targetVoice;
+        }
+      }
+
       window.speechSynthesis.speak(utterance);
       playSound('pop');
+    }
+
+    function updateSpeechRate(val) {
+      userSpeechRate = parseFloat(val);
+      document.getElementById('speech-rate-slider').value = userSpeechRate;
+      document.getElementById('speech-rate-val').innerText = `${userSpeechRate.toFixed(2)}x 倍速`;
+    }
+
+    function updateSpeechPitch(val) {
+      userSpeechPitch = parseFloat(val);
+      document.getElementById('speech-pitch-slider').value = userSpeechPitch;
+      let label = '標準';
+      if (userSpeechPitch > 1.15) label = '清脆高亢';
+      else if (userSpeechPitch < 0.85) label = '低沉穩重';
+      document.getElementById('speech-pitch-val').innerText = `${userSpeechPitch.toFixed(2)} (${label})`;
+    }
+
+    function updateSelectedVoice(uri) {
+      selectedVoiceURI = uri;
+      const v = availableVoices.find(item => item.voiceURI === uri);
+      if (v) {
+        showToast(`已切換音色：${v.name}`);
+      }
+    }
+
+    function testVoiceSettings() {
+      speakText('您好！這是目前的語音速度與音色效果，每一位小朋友的身體都是宇宙中最珍貴的小星球！');
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        populateVoiceList();
+      };
+    }
+
+    /* ========================================================================= */
+    /* ACCESSIBILITY: HIGH CONTRAST, SMARTBOARD, FONT SCALE                      */
+    /* ========================================================================= */
+    let isHighContrast = false;
+    let isSmartboardMode = false;
+
+    function toggleHighContrast() {
+      isHighContrast = !isHighContrast;
+      document.body.classList.toggle('high-contrast', isHighContrast);
+      playSound('pop');
+      showToast(isHighContrast ? '已開啟高對比無視障模式' : '已切換回標準主題色彩');
+    }
+
+    function toggleSmartboardMode() {
+      isSmartboardMode = !isSmartboardMode;
+      document.body.classList.toggle('classroom-mode', isSmartboardMode);
+      playSound('pop');
+      showToast(isSmartboardMode ? '已開啟教室大螢幕觸控模式' : '已關閉大螢幕模式');
+    }
+
+    function setFontScale(scaleKey) {
+      playSound('pop');
+      currentFontScale = scaleKey;
+      const body = document.body;
+
+      const scales = {
+        standard: { size: '16px', badge: '目前：標準 (16px)' },
+        large: { size: '18px', badge: '目前：放大 (18px)' },
+        xlarge: { size: '20px', badge: '目前：特大 (20px)' },
+        huge: { size: '22px', badge: '目前：超大 (22px)' }
+      };
+
+      body.style.fontSize = scales[scaleKey].size;
+      document.getElementById('current-font-size-badge').innerText = scales[scaleKey].badge;
+
+      ['standard', 'large', 'xlarge', 'huge'].forEach(key => {
+        const btn = document.getElementById(`font-scale-${key}`);
+        if (key === scaleKey) {
+          btn.className = 'font-scale-btn py-2.5 px-2 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-indigo-900 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile';
+        } else {
+          btn.className = 'font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition btn-tactile';
+        }
+      });
+
+      showToast(`字體已切換至：${scales[scaleKey].badge}`);
     }
 
     function showToast(message, iconClass = 'fa-solid fa-circle-check text-emerald-400') {
@@ -1543,137 +2116,19 @@
       document.getElementById('guide-modal').classList.add('hidden');
     }
 
-    /* Accessibility Settings Configuration (Font scale, Speech Rate, Pitch, Voice) */
-    let currentFontScale = 'standard';
-    let userSpeechRate = 0.95;
-    let userSpeechPitch = 1.05;
-    let selectedVoiceURI = '';
-    let availableVoices = [];
-
     function showSettingsModal() {
       playSound('pop');
       populateVoiceList();
       document.getElementById('settings-modal').classList.remove('hidden');
     }
-
     function closeSettingsModal() {
       playSound('click');
       document.getElementById('settings-modal').classList.add('hidden');
     }
 
-    function setFontScale(scaleKey) {
-      playSound('pop');
-      currentFontScale = scaleKey;
-      const body = document.body;
-
-      const scales = {
-        standard: { size: '16px', badge: '目前：標準 (16px)' },
-        large: { size: '18px', badge: '目前：放大 (18px)' },
-        xlarge: { size: '20px', badge: '目前：特大 (20px)' },
-        huge: { size: '22px', badge: '目前：超大 (22px)' }
-      };
-
-      body.style.fontSize = scales[scaleKey].size;
-      document.getElementById('current-font-size-badge').innerText = scales[scaleKey].badge;
-
-      // Update button visual states
-      ['standard', 'large', 'xlarge', 'huge'].forEach(key => {
-        const btn = document.getElementById(`font-scale-${key}`);
-        if (key === scaleKey) {
-          btn.className = 'font-scale-btn py-2.5 px-2 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-indigo-900 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition';
-        } else {
-          btn.className = 'font-scale-btn py-2.5 px-2 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 text-slate-700 font-black text-xs sm:text-sm flex flex-col items-center justify-center transition';
-        }
-      });
-
-      showToast(`字體已切換至：${scales[scaleKey].badge}`);
-    }
-
-    function updateSpeechRate(val) {
-      userSpeechRate = parseFloat(val);
-      document.getElementById('speech-rate-slider').value = userSpeechRate;
-      document.getElementById('speech-rate-val').innerText = `${userSpeechRate.toFixed(2)}x 倍速`;
-    }
-
-    function updateSpeechPitch(val) {
-      userSpeechPitch = parseFloat(val);
-      document.getElementById('speech-pitch-slider').value = userSpeechPitch;
-      let label = '標準';
-      if (userSpeechPitch > 1.15) label = '清脆高亢';
-      else if (userSpeechPitch < 0.85) label = '低沉穩重';
-      document.getElementById('speech-pitch-val').innerText = `${userSpeechPitch.toFixed(2)} (${label})`;
-    }
-
-    function populateVoiceList() {
-      if (!('speechSynthesis' in window)) return;
-      availableVoices = window.speechSynthesis.getVoices();
-      const select = document.getElementById('voice-select');
-      if (!select) return;
-
-      if (!availableVoices || availableVoices.length === 0) {
-        select.innerHTML = '<option value="">系統預設中文語音</option>';
-        return;
-      }
-
-      // Prioritize Chinese voices (zh-TW, zh-HK, zh-CN, etc.)
-      const zhVoices = availableVoices.filter(v => v.lang.includes('zh') || v.lang.includes('cmn'));
-      const otherVoices = availableVoices.filter(v => !v.lang.includes('zh') && !v.lang.includes('cmn'));
-      const combined = [...zhVoices, ...otherVoices];
-
-      select.innerHTML = '';
-      combined.forEach((voice, index) => {
-        const opt = document.createElement('option');
-        opt.value = voice.voiceURI;
-        const isZh = voice.lang.includes('zh') || voice.lang.includes('cmn');
-        opt.textContent = `${isZh ? '⭐ ' : ''}${voice.name} (${voice.lang})${voice.default ? ' [預設]' : ''}`;
-        if (voice.voiceURI === selectedVoiceURI || (!selectedVoiceURI && isZh && (voice.lang.includes('TW') || index === 0))) {
-          opt.selected = true;
-          selectedVoiceURI = voice.voiceURI;
-        }
-        select.appendChild(opt);
-      });
-    }
-
-    function updateSelectedVoice(uri) {
-      selectedVoiceURI = uri;
-      const v = availableVoices.find(item => item.voiceURI === uri);
-      if (v) {
-        showToast(`已切換音色：${v.name}`);
-      }
-    }
-
-    function testVoiceSettings() {
-      speakText('您好！這是目前的語音速度與音色效果，每一位小朋友的身體都是宇宙中最珍貴的小星球！');
-    }
-
-    // Initialize voice change listener
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        populateVoiceList();
-      };
-    }
-
-    // Web Speech API Voice synthesis with custom user settings
-    function speakText(text) {
-      if (!isAudioEnabled || !('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-TW';
-      utterance.rate = userSpeechRate;
-      utterance.pitch = userSpeechPitch;
-
-      if (selectedVoiceURI && availableVoices.length > 0) {
-        const targetVoice = availableVoices.find(v => v.voiceURI === selectedVoiceURI);
-        if (targetVoice) {
-          utterance.voice = targetVoice;
-        }
-      }
-
-      window.speechSynthesis.speak(utterance);
-      playSound('pop');
-    }
-
-    /* Top Main Tab Switching (Plan 1 vs Plan 2 vs Doc) */
+    /* ========================================================================= */
+    /* TOP TABS SWITCHER                                                         */
+    /* ========================================================================= */
     function switchMainTab(tabKey) {
       playSound('click');
       document.getElementById('module-plan1').classList.add('hidden');
@@ -1696,10 +2151,13 @@
       } else if (tabKey === 'plan2') {
         speakText('歡迎來到方案二：多元密碼破譯戰與友善天平。');
       } else if (tabKey === 'doc') {
-        speakText('特需綱要與亮點對照表。');
+        speakText('十二年國教特殊教育課程綱要與三大亮點對照表。');
       }
     }
 
+    /* ========================================================================= */
+    /* MODULE 1: PLAN 1 LOGIC (Doll, Characters, Concentric Circles, AAC)         */
+    /* ========================================================================= */
     function setPlan1Tool(toolName) {
       playSound('click');
       document.getElementById('p1-tool-doll').classList.add('hidden');
@@ -1708,11 +2166,11 @@
 
       const tabs = document.querySelectorAll('.p1-tab-btn');
       tabs.forEach(t => {
-        t.className = 'p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
+        t.className = 'p1-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile';
       });
 
       const activeBtn = document.getElementById(`btn-p1-${toolName}`);
-      activeBtn.className = 'p1-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200';
+      activeBtn.className = 'p1-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200 btn-tactile';
 
       document.getElementById(`p1-tool-${toolName}`).classList.remove('hidden');
       if (toolName === 'circles') {
@@ -1722,27 +2180,60 @@
       }
     }
 
+    // 4 Characters Switcher
+    let currentCharacter = 'star';
+    function switchCharacter(charKey) {
+      playSound('pop');
+      currentCharacter = charKey;
+      ['star', 'sunny', 'ann', 'yu'].forEach(c => {
+        const btn = document.getElementById(`char-btn-${c}`);
+        btn.className = (c === charKey) 
+          ? 'char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-indigo-600 text-white shadow-xs'
+          : 'char-btn px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+
+      // Switch Hair Layer
+      ['star', 'sunny', 'ann', 'yu'].forEach(c => {
+        const hGroup = document.getElementById(`hair-${c}-group`);
+        if (hGroup) hGroup.classList.toggle('hidden', c !== charKey);
+      });
+
+      // Wheelchair Layer
+      const wc = document.getElementById('wheelchair-group');
+      if (wc) wc.classList.toggle('hidden', charKey !== 'yu');
+
+      const names = { star: '小星 (溫暖探索家)', sunny: '小晴 (可愛雙辮)', ann: '小安 (清爽短髮)', yu: '小宇 (輪椅活力好夥伴)' };
+      showToast(`已切換同伴：${names[charKey]}`);
+      speakText(`切換同伴為：${names[charKey]}。每個人都有獨特身體，界限都值得被尊重！`);
+    }
+
     // Swimsuit Toggle
-    let swimsuitOn = true;
+    let swimsuitOn = false;
     function toggleSwimsuit() {
       playSound('pop');
       swimsuitOn = !swimsuitOn;
-      const group = document.getElementById('swimsuit-group');
+      const swimsuitGroup = document.getElementById('swimsuit-group');
+      const casualGroup = document.getElementById('casual-clothes-group');
       const btnText = document.getElementById('swimsuit-btn-text');
+
       if (swimsuitOn) {
-        group.style.opacity = '1';
-        btnText.innerText = '穿上泳衣探索隱私處';
-        showToast('布偶已穿上泳衣');
-        speakText('布偶已穿上泳衣，探索泳衣覆蓋的紅色隱私處。');
+        swimsuitGroup.style.opacity = '1';
+        swimsuitGroup.classList.remove('pointer-events-none');
+        casualGroup.style.opacity = '0.1';
+        btnText.innerText = '換回日常服裝';
+        showToast('已穿上泳衣！觀察泳裝覆蓋的紅色隱私處');
+        speakText('已穿上泳衣！泳裝覆蓋的胸部和私密處，是任何人都不能隨便觸碰的紅色隱私處！');
       } else {
-        group.style.opacity = '0.15';
-        btnText.innerText = '脫下泳衣觀察覆蓋區域';
-        showToast('已觀察泳裝保護部位');
-        speakText('已觀察泳裝保護部位，記住泳衣覆蓋的地方任何人都不可以隨意碰觸。');
+        swimsuitGroup.style.opacity = '0';
+        swimsuitGroup.classList.add('pointer-events-none');
+        casualGroup.style.opacity = '1';
+        btnText.innerText = '穿上泳衣探索隱私處';
+        showToast('已換回日常便服');
+        speakText('已換回日常便服。');
       }
     }
 
-    // Magnet selection
+    // Magnet Selection
     let selectedMagnet = 'red';
     function selectMagnet(color) {
       playSound('pop');
@@ -1759,10 +2250,10 @@
       };
       document.getElementById('selected-magnet-name').innerText = names[color];
       document.getElementById('active-magnet-hint').className = `bg-${color === 'red' ? 'rose' : color === 'yellow' ? 'amber' : 'emerald'}-50 border border-${color === 'red' ? 'rose' : color === 'yellow' ? 'amber' : 'emerald'}-300 rounded-2xl p-3 text-sm text-${color === 'red' ? 'rose' : color === 'yellow' ? 'amber' : 'emerald'}-900 font-black text-center flex items-center justify-center gap-2`;
-      speakText(`已拿起${names[color]}，請點選布偶身上部位！`);
+      speakText(`已拿起${names[color]}，請點選布偶身體部位！`);
     }
 
-    // Body parts dictionary for feedback
+    // Knowledge dictionary for doll parts
     const bodyKnowledge = {
       chest: {
         title: '胸部（紅色核心隱私處）',
@@ -1770,7 +2261,8 @@
         badge: '紅色禁止：絕對保護區',
         badgeBg: 'bg-rose-100 text-rose-700',
         desc: '泳裝覆蓋的胸部部位是絕對隱私！未經允許任何人都不可以觸摸、觀看或拍照。若有人故意碰到，必須立刻大聲說「不行」並向老師或家長報告。',
-        guide: '普特引導：普通生學會不可隨意拉扯特教同學的衣服；特教生學會明確拒絕越界碰觸。'
+        guide: '普特引導：普通生學會不可隨意拉扯特教同學的衣服；特教生學會明確拒絕越界碰觸。',
+        pinCoord: { x: 170, y: 180 }
       },
       groin: {
         title: '泳褲私密部位（紅色核心隱私處）',
@@ -1778,7 +2270,8 @@
         badge: '紅色禁止：絕對保護區',
         badgeBg: 'bg-rose-100 text-rose-700',
         desc: '泳褲覆蓋的私密器官是我們最重要的身體寶藏，任何人都不能隨便摸。即使是醫生檢查，也需要有爸爸媽媽陪同。',
-        guide: '普特引導：保護自己的隱私部位，也絕對不可以取笑或偷看別人的隱私處。'
+        guide: '普特引導：保護自己的隱私部位，也絕對不可以取笑或偷看別人的隱私處。',
+        pinCoord: { x: 170, y: 252 }
       },
       'shoulder-left': {
         title: '肩膀與手肘（黃色信號區）',
@@ -1786,7 +2279,8 @@
         badge: '黃色信號：先問問才可以',
         badgeBg: 'bg-amber-100 text-amber-800',
         desc: '好朋友、熟悉的同學可以輕碰手肘或搭肩提醒，但每一次都必須「先徵詢對方同意」。如果同學今天不想被碰，就要立刻停手。',
-        guide: '普特引導：特教同學如果對觸覺敏感，普通生要學會保持距離，先問：「我可以在你旁邊拍拍肩膀提醒你嗎？」'
+        guide: '普特引導：特教同學如果對觸覺敏感，普通生要學會保持距離，先問：「我可以在你旁邊拍拍肩膀提醒你嗎？」',
+        pinCoord: { x: 92, y: 188 }
       },
       'shoulder-right': {
         title: '肩膀與手肘（黃色信號區）',
@@ -1794,7 +2288,8 @@
         badge: '黃色信號：先問問才可以',
         badgeBg: 'bg-amber-100 text-amber-800',
         desc: '熟人與好朋友的互動區域，需要先問問。如果對方皺眉頭或說不要，必須立刻放下雙手。',
-        guide: '普特引導：尊重個別差異，有些同學不喜歡被觸碰手肘，我們要尊重對方的感受。'
+        guide: '普特引導：尊重個別差異，有些同學不喜歡被觸碰手肘，我們要尊重對方的感受。',
+        pinCoord: { x: 250, y: 188 }
       },
       'hand-left': {
         title: '手掌（綠色禮貌打招呼區）',
@@ -1802,7 +2297,8 @@
         badge: '綠色安全：禮貌互動區',
         badgeBg: 'bg-emerald-100 text-emerald-800',
         desc: '手掌可以用來揮手說早安、擊掌（High Five）慶祝、或者在排隊遊戲時牽手（先問過）。這是最健康的同儕互動方式！',
-        guide: '普特引導：鼓勵全班同學練習用揮手、給予讚賞的手勢與特教同學打招呼。'
+        guide: '普特引導：鼓勵全班同學練習用揮手、給予讚賞的手勢與特教同學打招呼。',
+        pinCoord: { x: 62, y: 272 }
       },
       'hand-right': {
         title: '手掌（綠色禮貌打招呼區）',
@@ -1810,15 +2306,8 @@
         badge: '綠色安全：禮貌互動區',
         badgeBg: 'bg-emerald-100 text-emerald-800',
         desc: '手掌可以用來打招呼或給予鼓勵手勢。保持友善、乾淨與安全的界限。',
-        guide: '普特引導：練習使用手勢互動，增進同儕情感。'
-      },
-      legs: {
-        title: '雙腿與膝蓋（黃色/紅色交界）',
-        correctColor: 'yellow',
-        badge: '黃色信號：不可隨意碰觸',
-        badgeBg: 'bg-amber-100 text-amber-800',
-        desc: '大腿靠近私密處屬於絕對隱私（紅色）；小腿若排隊踢到應立刻道歉。平常不應隨意觸摸同學的大腿或膝蓋。',
-        guide: '普特引導：排隊時注意腳步與距離，不踢踹、不攀爬他人身體。'
+        guide: '普特引導：練習使用手勢互動，增進同儕情感。',
+        pinCoord: { x: 282, y: 245 }
       },
       head: {
         title: '頭部與臉頰（黃色尊重區）',
@@ -1826,19 +2315,22 @@
         badge: '黃色信號：先問問才可以',
         badgeBg: 'bg-amber-100 text-amber-800',
         desc: '頭部和頭髮很脆弱，不要隨意去摸同學的頭或抓扯頭髮，這會讓對方感到不舒服或不受尊重。',
-        guide: '普特引導：不隨意拍打或搓弄特教同學的頭髮，每個人都有身體自主權。'
+        guide: '普特引導：不隨意拍打或搓弄特教同學的頭髮，每個人都有身體自主權。',
+        pinCoord: { x: 170, y: 62 }
       },
-      hair: {
-        title: '頭髮（黃色尊重區）',
+      legs: {
+        title: '雙腿與膝蓋（黃色/紅色交界）',
         correctColor: 'yellow',
-        badge: '黃色信號：尊重不拉扯',
+        badge: '黃色信號：不可隨意碰觸',
         badgeBg: 'bg-amber-100 text-amber-800',
-        desc: '排隊時不可拉扯前面的頭髮或辮子。未經同意碰觸他人頭髮屬於越界騷擾行為。',
-        guide: '普特引導：養成遵守排隊秩序、雙手放好不亂摸同學頭髮的好習慣。'
+        desc: '大腿靠近私密處屬於絕對隱私（紅色）；小腿若排隊踢到應立刻道歉。平常不應隨意觸摸同學的大腿或膝蓋。',
+        guide: '普特引導：排隊時注意腳步與距離，不踢踹、不攀爬他人身體。',
+        pinCoord: { x: 170, y: 320 }
       }
     };
 
     let currentPartKey = 'chest';
+    let exploredParts = new Set();
 
     function clickDollPart(partKey, partName) {
       currentPartKey = partKey;
@@ -1853,6 +2345,11 @@
         miniFeedback.innerHTML = `<span class="text-emerald-600 font-black">答對了！${partName} 是正確的信號！</span>`;
         pin.className = `w-3.5 h-3.5 rounded-full ${selectedMagnet === 'red' ? 'bg-rose-500' : selectedMagnet === 'yellow' ? 'bg-amber-400' : 'bg-emerald-500'}`;
         showToast(`太棒了！成功貼上${info.correctColor === 'red' ? '紅燈' : info.correctColor === 'yellow' ? '黃燈' : '綠燈'}信號磁貼！`);
+        
+        // Add Pin to SVG
+        addPinToDollSVG(info.pinCoord.x, info.pinCoord.y, info.correctColor);
+        exploredParts.add(partKey);
+        updateExplorationScore();
       } else {
         miniFeedback.innerHTML = `<span class="text-rose-600 font-black">想一想：${partName} 應該是${info.correctColor === 'red' ? '紅燈' : info.correctColor === 'yellow' ? '黃燈' : '綠燈'}喔！</span>`;
       }
@@ -1867,11 +2364,50 @@
       speakCurrentFeedback();
     }
 
+    function addPinToDollSVG(x, y, color) {
+      const layer = document.getElementById('placed-pins-layer');
+      if (!layer) return;
+      const fillColor = color === 'red' ? '#ef4444' : color === 'yellow' ? '#f59e0b' : '#10b981';
+      const iconChar = color === 'red' ? '✕' : color === 'yellow' ? '?' : '✓';
+      
+      const pinG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      pinG.setAttribute('class', 'animate-bounce');
+      pinG.innerHTML = `
+        <circle cx="${x}" cy="${y}" r="12" fill="${fillColor}" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+        <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="900" fill="#ffffff">${iconChar}</text>
+      `;
+      layer.appendChild(pinG);
+    }
+
+    function resetDollPins() {
+      playSound('pop');
+      const layer = document.getElementById('placed-pins-layer');
+      if (layer) layer.innerHTML = '';
+      exploredParts.clear();
+      updateExplorationScore();
+      showToast('已重置布偶上的磁貼');
+    }
+
+    function updateExplorationScore() {
+      const scoreBadge = document.getElementById('exploration-score');
+      const count = exploredParts.size;
+      scoreBadge.innerText = `${count}/5 ⭐`;
+      if (count >= 5) {
+        playSound('magic');
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+        }
+        showToast('太棒了！你已完成五大身體界限探索，榮獲「身體小衛士」！', 'fa-solid fa-medal text-yellow-400');
+        speakText('太棒了！你已完成五大身體界限探索，榮獲身體保護小衛士徽章！');
+      }
+    }
+
     function speakCurrentFeedback() {
       const info = bodyKnowledge[currentPartKey] || bodyKnowledge['chest'];
       speakText(`${info.title}。${info.desc}`);
     }
 
+    // Concentric Circles
     const circlesInfo = {
       red: {
         title: '內層：紅燈核心圈（我自己的身體與泳裝隱私部位）',
@@ -1883,7 +2419,7 @@
       },
       yellow: {
         title: '中層：黃燈朋友圈（熟識同學與好朋友）',
-        badge: '黃燈朋友圈 (手肘距離)',
+        badge: '黃燈朋友圈 (0.5~1公尺)',
         badgeBg: 'bg-amber-200 text-amber-900',
         cardBg: 'bg-amber-50 border-amber-300',
         desc: '這是好朋友與熟識同儕互動的安全圈。可以牽手排隊、碰手肘提醒，但必須「先問問，才可以」。只要對方皺眉或拒絕，就要立刻後退回綠燈圈。',
@@ -1891,7 +2427,7 @@
       },
       green: {
         title: '外層：綠燈禮貌圈（保持約一隻手臂的禮貌距離）',
-        badge: '綠燈禮貌圈 (揮手距離)',
+        badge: '綠燈禮貌圈 (1~2公尺)',
         badgeBg: 'bg-emerald-200 text-emerald-900',
         cardBg: 'bg-emerald-50 border-emerald-300',
         desc: '全班同學、新朋友與一般師長互動的安全禮貌距離。揮手、微笑、點頭說早安，不隨便衝撞或熊抱他人。',
@@ -1905,7 +2441,7 @@
       currentCircleKey = zone;
       const data = circlesInfo[zone];
       const card = document.getElementById('circle-detail-card');
-      card.className = `${data.cardBg} border-2 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm transition-all`;
+      card.className = `${data.cardBg} border-2 rounded-3xl p-5 sm:p-6 space-y-4 shadow-card-float transition-all`;
       
       const badge = document.getElementById('circle-badge');
       badge.innerText = data.badge;
@@ -1923,21 +2459,60 @@
       speakText(`${data.title}。${data.desc}`);
     }
 
+    function walkAvatarTo(zone) {
+      playSound('pop');
+      selectCircleZone(zone);
+      const avatar = document.getElementById('walking-avatar');
+      const bubble = document.getElementById('avatar-bubble-text');
+
+      if (zone === 'green') {
+        avatar.style.top = '15px';
+        bubble.innerText = '早安！微笑揮揮手！';
+        speakText('綠燈圈：早安！微笑揮手保持禮貌距離！');
+      } else if (zone === 'yellow') {
+        avatar.style.top = '70px';
+        bubble.innerText = '請問我可以牽你的手嗎？';
+        speakText('黃燈朋友圈：請問我可以牽你的手嗎？');
+      } else if (zone === 'red') {
+        avatar.style.top = '145px';
+        bubble.innerText = '這是我的身體核心隱私！';
+        speakText('紅燈核心圈：這是我的身體核心隱私，未經同意請退後！');
+      }
+    }
+
     // AAC Sound triggers
     function playAACSounds(actionType, textSentence) {
-      if (actionType === 'ask-hand') {
-        playSound('pop');
-      } else if (actionType === 'agree') {
+      if (actionType === 'agree') {
         playSound('success');
       } else if (actionType === 'refuse') {
         playSound('alert');
       } else {
         playSound('pop');
       }
-      showToast(`AAC 發聲語音：「${textSentence}」`);
+      showToast(`AAC 發聲：「${textSentence}」`);
       speakText(textSentence);
+
+      // Append to dialogue simulation window
+      const win = document.getElementById('aac-dialogue-window');
+      const isAsk = actionType.includes('ask');
+      const isAgree = actionType === 'agree';
+      const isRefuse = actionType === 'refuse';
+      
+      const badgeColor = isAsk ? 'bg-indigo-100 text-indigo-700' : isAgree ? 'bg-emerald-100 text-emerald-800' : isRefuse ? 'bg-rose-100 text-rose-800' : 'bg-purple-100 text-purple-800';
+      const speakerName = isAsk ? '同學 A (發問者)' : '同學 B (回應者)';
+
+      win.innerHTML = `
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-black px-2.5 py-0.5 rounded-full ${badgeColor}">${speakerName}</span>
+          <span class="text-xs text-slate-400 font-bold">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <p class="text-base font-black text-slate-800">「${textSentence}」</p>
+      `;
     }
 
+    /* ========================================================================= */
+    /* MODULE 2: PLAN 2 LOGIC (Trait Classification, Scenarios, Balance Scale)   */
+    /* ========================================================================= */
     function setPlan2Tool(toolName) {
       playSound('click');
       document.getElementById('p2-tool-traits').classList.add('hidden');
@@ -1946,11 +2521,11 @@
 
       const tabs = document.querySelectorAll('.p2-tab-btn');
       tabs.forEach(t => {
-        t.className = 'p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
+        t.className = 'p2-tab-btn px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 btn-tactile';
       });
 
       const activeBtn = document.getElementById(`btn-p2-${toolName}`);
-      activeBtn.className = 'p2-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200';
+      activeBtn.className = 'p2-tab-btn active px-5 py-3 rounded-2xl text-base font-black transition flex items-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-200 btn-tactile';
 
       document.getElementById(`p2-tool-${toolName}`).classList.remove('hidden');
 
@@ -1963,14 +2538,16 @@
       }
     }
 
-    /* Trait Cards Data */
-    const traitCards = [
+    // Trait Cards Data
+    let traitCards = [
       { id: 't1', text: '溫柔細心照顧人', icon: 'fa-hand-holding-heart', color: 'text-rose-500', bucket: 'unassigned', insight: '「溫柔細心」不是女生的專利，男生一樣可以體貼溫柔、照顧身邊的同學！' },
       { id: 't2', text: '熱愛在球場踢足球', icon: 'fa-futbol', color: 'text-blue-500', bucket: 'unassigned', insight: '女生一樣可以在運動場上奔馳射門！球類運動屬於每一個熱愛流汗的人。' },
       { id: 't3', text: '留長頭髮綁辮子', icon: 'fa-scissors', color: 'text-purple-500', bucket: 'unassigned', insight: '髮型只是個人風格，男生留長髮綁馬尾、女生剪俐落短髮都很有自信！' },
       { id: 't4', text: '安靜專注在角落畫畫', icon: 'fa-palette', color: 'text-amber-500', bucket: 'unassigned', insight: '內向文靜不是軟弱，能沉浸在藝術創作中的每個人都很閃耀。' },
       { id: 't5', text: '坐輪椅也能打球競賽', icon: 'fa-wheelchair-move', color: 'text-teal-600', bucket: 'unassigned', insight: '破除身障刻板！身障同學擁有強韌的體力與鬥志，輪椅籃球精彩無比！' },
-      { id: 't6', text: '說話慢慢的需要多等一下', icon: 'fa-hourglass-half', color: 'text-indigo-600', bucket: 'unassigned', insight: '每個人表達節奏不同，耐心傾聽特教同學表達，就是最高級的尊重。' }
+      { id: 't6', text: '說話慢慢的需要多等一下', icon: 'fa-hourglass-half', color: 'text-indigo-600', bucket: 'unassigned', insight: '每個人表達節奏不同，耐心傾聽特教同學表達，就是最高級的尊重。' },
+      { id: 't7', text: '熱愛組裝機器人與工程', icon: 'fa-robot', color: 'text-sky-600', bucket: 'unassigned', insight: '科技與機械屬於所有人！無論男女，都可以成為出色的發明家！' },
+      { id: 't8', text: '遇到挫折時難過掉眼淚', icon: 'fa-face-sad-tear', color: 'text-blue-400', bucket: 'unassigned', insight: '流淚是健康的情緒釋放！男生、女生都可以誠實表達脆弱與悲傷。' }
     ];
 
     let selectedTraitId = null;
@@ -1978,8 +2555,10 @@
 
     function handleDragStart(e, id) {
       draggedTraitId = id;
-      e.dataTransfer.setData('text/plain', id);
-      e.dataTransfer.effectAllowed = 'move';
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', id);
+        e.dataTransfer.effectAllowed = 'move';
+      }
       const el = e.currentTarget;
       el.classList.add('opacity-40', 'scale-95');
       playSound('pop');
@@ -1991,13 +2570,11 @@
       document.querySelectorAll('.drop-zone').forEach(z => {
         z.classList.remove('ring-4', 'ring-indigo-400', 'bg-indigo-50/70', 'scale-[1.01]');
       });
-      const deck = document.getElementById('trait-cards-deck');
-      if (deck) deck.classList.remove('ring-4', 'ring-indigo-400', 'bg-indigo-50/60');
     }
 
     function handleDragOver(e) {
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
       const dropzone = e.currentTarget;
       dropzone.classList.add('ring-4', 'ring-indigo-400', 'scale-[1.01]');
     }
@@ -2044,7 +2621,7 @@
         touchClone.style.zIndex = '9999';
         touchClone.style.pointerEvents = 'none';
         touchClone.style.transform = 'scale(1.05)';
-        touchClone.style.boxShadow = '0 12px 24px rgba(0,0,0,0.18)';
+        touchClone.style.boxShadow = '0 12px 24px rgba(0,0,0,0.2)';
         document.body.appendChild(touchClone);
 
         el.style.opacity = '0.35';
@@ -2106,18 +2683,18 @@
           cardEl.ondragstart = (e) => handleDragStart(e, card.id);
           cardEl.ondragend = (e) => handleDragEnd(e);
           cardEl.onclick = () => selectTraitCard(card.id);
-          cardEl.className = `p-3.5 rounded-2xl border-2 bg-white hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex flex-col items-center text-center justify-between gap-2 select-none ${selectedTraitId === card.id ? 'border-purple-500 ring-2 ring-purple-300' : 'border-slate-200'}`;
+          cardEl.className = `p-3 rounded-2xl border-2 bg-white hover:shadow-md cursor-grab active:cursor-grabbing transition-all flex flex-col items-center text-center justify-between gap-1.5 select-none ${selectedTraitId === card.id ? 'border-purple-500 ring-2 ring-purple-300' : 'border-slate-200'}`;
           cardEl.innerHTML = `
             <div class="flex items-center justify-between w-full">
               <span class="w-5"></span>
-              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center pointer-events-none">
-                <i class="fa-solid ${card.icon} ${card.color} text-xl"></i>
+              <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center pointer-events-none">
+                <i class="fa-solid ${card.icon} ${card.color} text-lg"></i>
               </div>
               <button onclick="event.stopPropagation(); speakText('${card.text}。${card.insight}')" class="tts-speaker-btn w-6 h-6 text-[10px]" title="朗讀特質與解析"><i class="fa-solid fa-volume-high"></i></button>
             </div>
-            <span class="text-sm font-black text-slate-800 leading-snug pointer-events-none">${card.text}</span>
-            <div class="flex items-center gap-1 text-xs text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-full pointer-events-none font-bold">
-              <i class="fa-solid fa-arrows-up-down-left-right text-[10px]"></i> 按住拖曳
+            <span class="text-xs sm:text-sm font-black text-slate-800 leading-snug pointer-events-none">${card.text}</span>
+            <div class="flex items-center gap-1 text-[11px] text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full pointer-events-none font-bold">
+              <i class="fa-solid fa-arrows-up-down-left-right text-[9px]"></i> 按住拖曳
             </div>
           `;
           initTouchDrag(cardEl, card.id);
@@ -2128,15 +2705,15 @@
           item.draggable = true;
           item.ondragstart = (e) => handleDragStart(e, card.id);
           item.ondragend = (e) => handleDragEnd(e);
-          item.className = 'px-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-black text-slate-800 flex items-center justify-between shadow-xs cursor-grab active:cursor-grabbing hover:border-slate-400 transition select-none';
+          item.className = 'px-3.5 py-2.5 rounded-2xl bg-white border border-slate-200 text-xs sm:text-sm font-black text-slate-800 flex items-center justify-between shadow-xs cursor-grab active:cursor-grabbing hover:border-slate-400 transition select-none';
           item.innerHTML = `
-            <span class="flex items-center gap-2.5 pointer-events-none">
-              <i class="fa-solid ${card.icon} ${card.color} text-base"></i>
+            <span class="flex items-center gap-2 pointer-events-none">
+              <i class="fa-solid ${card.icon} ${card.color} text-sm"></i>
               <span>${card.text}</span>
             </span>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1">
               <button onclick="speakText('${card.text}。${card.insight}')" class="tts-speaker-btn w-6 h-6 text-[10px]" title="朗讀"><i class="fa-solid fa-volume-high"></i></button>
-              <button onclick="revertTraitCard('${card.id}')" class="text-slate-400 hover:text-rose-600 text-sm p-1 ml-1" title="放回上方牌堆"><i class="fa-solid fa-rotate-left"></i></button>
+              <button onclick="revertTraitCard('${card.id}')" class="text-slate-400 hover:text-rose-600 text-xs p-1 ml-0.5" title="放回上方牌堆"><i class="fa-solid fa-rotate-left"></i></button>
             </div>
           `;
           initTouchDrag(item, card.id);
@@ -2207,9 +2784,9 @@
             <p class="text-sm sm:text-base text-slate-700 font-medium">${card.insight}</p>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button onclick="assignTrait('${card.id}', 'boy')" class="px-3.5 py-2 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-900 font-black text-xs sm:text-sm">分類給男孩</button>
-            <button onclick="assignTrait('${card.id}', 'all')" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs sm:text-sm shadow-sm">所有人都可以！</button>
-            <button onclick="assignTrait('${card.id}', 'girl')" class="px-3.5 py-2 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 font-black text-xs sm:text-sm">分類給女孩</button>
+            <button onclick="assignTrait('${card.id}', 'boy')" class="px-3.5 py-2 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-900 font-black text-xs sm:text-sm btn-tactile">只屬於男孩？</button>
+            <button onclick="assignTrait('${card.id}', 'all')" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs sm:text-sm shadow-sm btn-tactile">所有人都可以！</button>
+            <button onclick="assignTrait('${card.id}', 'girl')" class="px-3.5 py-2 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 font-black text-xs sm:text-sm btn-tactile">只屬於女孩？</button>
           </div>
         </div>
       `;
@@ -2222,13 +2799,16 @@
       selectedTraitId = null;
 
       if (bucket === 'all') {
-        playSound('success');
+        playSound('magic');
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+        }
         showToast('太棒了！打破刻板印象，這項特質屬於所有人！', 'fa-solid fa-heart text-pink-500');
         speakText('太棒了！打破刻板印象，這項特質屬於所有人！' + card.insight);
       } else {
         playSound('pop');
         showToast(`已分類至「${bucket === 'boy' ? '男孩' : '女孩'}」盤面，想一想：另一種性別也能擁有這項特質嗎？`);
-        speakText(`已放入${bucket === 'boy' ? '男孩' : '女孩'}盤面。老師引導：想一想，另一種性別也能擁有這項特質嗎？`);
+        speakText(`放入${bucket === 'boy' ? '男孩' : '女孩'}盤面。想一想，另一種性別也能擁有這項特質嗎？`);
       }
 
       document.getElementById('trait-insight-box').innerHTML = `
@@ -2261,6 +2841,40 @@
       speakText('已重置所有特質卡牌');
     }
 
+    // Custom Trait Modal
+    function showAddTraitModal() {
+      playSound('pop');
+      document.getElementById('add-trait-modal').classList.remove('hidden');
+    }
+    function closeAddTraitModal() {
+      playSound('click');
+      document.getElementById('add-trait-modal').classList.add('hidden');
+    }
+    function submitCustomTrait() {
+      const text = document.getElementById('custom-trait-text').value.trim();
+      const insight = document.getElementById('custom-trait-insight').value.trim() || '每個人都可以自由發展屬於自己的獨特天賦！';
+      if (!text) {
+        showToast('請輸入特質名稱！', 'fa-solid fa-triangle-exclamation text-amber-500');
+        return;
+      }
+      playSound('success');
+      traitCards.push({
+        id: `custom_${Date.now()}`,
+        text: text,
+        icon: 'fa-star',
+        color: 'text-purple-600',
+        bucket: 'unassigned',
+        insight: insight
+      });
+      document.getElementById('custom-trait-text').value = '';
+      document.getElementById('custom-trait-insight').value = '';
+      closeAddTraitModal();
+      renderTraitCards();
+      showToast('成功新增自訂特質卡牌！');
+      speakText(`成功新增特質卡：${text}`);
+    }
+
+    // Scenarios
     const scenariosData = {
       A: {
         title: '情境 A（性別嘲弄）',
@@ -2317,10 +2931,10 @@
       ['A', 'B', 'C', 'D'].forEach(k => {
         const btn = document.getElementById(`scen-btn-${k}`);
         if (k === key) {
-          btn.className = 'scen-btn w-full p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-left transition flex items-start gap-3.5';
+          btn.className = 'scen-btn w-full p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/70 text-left transition flex items-start gap-3.5 btn-tactile';
           btn.querySelector('span').className = 'w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0';
         } else {
-          btn.className = 'scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5';
+          btn.className = 'scen-btn w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 bg-white text-left transition flex items-start gap-3.5 btn-tactile';
           btn.querySelector('span').className = 'w-8 h-8 rounded-xl bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0';
         }
       });
@@ -2341,6 +2955,7 @@
       speakText(`${data.title}。判斷：${data.judgeDesc}。應對話術：${data.reject}。${data.advocate}`);
     }
 
+    // Covenant Tags & Balance Scale
     let covenantTags = [
       { id: 1, text: '不隨意拿特教同學的身體特徵開玩笑', author: '第 1 組承諾' },
       { id: 2, text: '體育課分組時，主動邀請不同特質的同學', author: '小強承諾' },
@@ -2353,18 +2968,18 @@
       container.innerHTML = '';
       covenantTags.forEach(tag => {
         const el = document.createElement('div');
-        el.className = 'bg-gradient-to-tr from-amber-50 to-amber-100/60 border border-amber-300 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between relative group';
+        el.className = 'sway-tag bg-gradient-to-tr from-amber-50 to-amber-100/70 border border-amber-300 rounded-2xl p-4 shadow-sm flex flex-col justify-between relative group hover:border-amber-400 transition';
         el.innerHTML = `
           <div class="flex items-start justify-between gap-2.5">
             <div class="flex items-start gap-2.5">
               <i class="fa-solid fa-tag text-amber-600 mt-1 text-base"></i>
-              <p class="text-base sm:text-lg font-black text-amber-950 leading-snug">${tag.text}</p>
+              <p class="text-sm sm:text-base font-black text-amber-950 leading-snug">${tag.text}</p>
             </div>
-            <button onclick="speakText('${tag.text}')" class="tts-speaker-btn tts-speaker-btn-amber w-7 h-7 text-xs shrink-0" title="朗讀此承諾"><i class="fa-solid fa-volume-high"></i></button>
+            <button onclick="speakText('${tag.text}')" class="tts-speaker-btn tts-speaker-btn-amber w-6 h-6 text-[10px] shrink-0" title="朗讀此承諾"><i class="fa-solid fa-volume-high"></i></button>
           </div>
-          <div class="flex items-center justify-between mt-3.5 pt-2.5 border-t border-amber-200/80 text-xs sm:text-sm text-amber-900 font-bold">
+          <div class="flex items-center justify-between mt-3 pt-2 border-t border-amber-200 text-xs text-amber-900 font-bold">
             <span><i class="fa-solid fa-signature"></i> ${tag.author}</span>
-            <button onclick="removeCovenantTag(${tag.id})" class="text-slate-400 hover:text-rose-600 text-sm transition" title="取下吊牌"><i class="fa-solid fa-trash-can"></i></button>
+            <button onclick="removeCovenantTag(${tag.id})" class="text-slate-400 hover:text-rose-600 text-xs transition" title="取下吊牌"><i class="fa-solid fa-trash-can"></i></button>
           </div>
         `;
         container.appendChild(el);
@@ -2379,42 +2994,53 @@
       const beam = document.getElementById('scale-beam');
       const status = document.getElementById('scale-balance-status');
       const kindnessText = document.getElementById('tray-kindness-text');
+      const msg = document.getElementById('scale-message');
 
       kindnessText.textContent = `承諾 ${count}`;
 
-      let deg = -4;
+      let deg = -6;
       if (count <= 1) {
         deg = 8;
         status.innerText = '天平狀態：亟需友善力量！';
-        status.className = 'text-rose-800 bg-rose-100 px-3.5 py-1.5 rounded-full';
+        status.className = 'text-rose-800 bg-rose-100 px-3.5 py-1.5 rounded-full shadow-xs';
+        msg.innerText = '目前承諾吊牌偏少，偏見負擔較重，請同學多掛上友善行動承諾！';
       } else if (count <= 3) {
         deg = 0;
         status.innerText = '天平狀態：維持平等共融';
-        status.className = 'text-amber-900 bg-amber-100 px-3.5 py-1.5 rounded-full';
+        status.className = 'text-amber-900 bg-amber-100 px-3.5 py-1.5 rounded-full shadow-xs';
+        msg.innerText = '天平達到平衡狀態，大家共同守護了基本的班級友善規則！';
       } else {
         deg = -8;
         status.innerText = '天平狀態：友善包容充沛！';
-        status.className = 'text-emerald-900 bg-emerald-100 px-3.5 py-1.5 rounded-full';
+        status.className = 'text-emerald-900 bg-emerald-100 px-3.5 py-1.5 rounded-full shadow-xs';
+        msg.innerText = '目前友善承諾力量充足，天平穩穩向「互相尊重與融合」傾斜！';
       }
 
-      beam.setAttribute('transform', `rotate(${deg} 150 98)`);
+      beam.setAttribute('transform', `rotate(${deg} 160 108)`);
     }
 
     function addNewCovenantTag() {
       const input = document.getElementById('new-covenant-input');
+      const authorInput = document.getElementById('new-covenant-author');
       const text = input.value.trim();
+      const author = authorInput.value.trim() || '我的一份承諾';
+      
       if (!text) {
         showToast('請先輸入或點選快速承諾內容！', 'fa-solid fa-circle-exclamation text-amber-400');
         return;
       }
       playSound('success');
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+      }
       const newTag = {
         id: Date.now(),
         text: text,
-        author: '我的一份承諾'
+        author: author
       };
       covenantTags.push(newTag);
       input.value = '';
+      authorInput.value = '';
       renderCovenantTags();
       showToast('成功掛上友善承諾木吊牌！天平更具包容力了！');
       speakText(`成功掛上承諾木吊牌：${text}`);
@@ -2433,7 +3059,53 @@
       showToast('已取下吊牌');
     }
 
-    /* Initialize on load */
+    // Printable Certificate
+    function openCertificateModal() {
+      playSound('magic');
+      const list = document.getElementById('certificate-promises-list');
+      list.innerHTML = '';
+      covenantTags.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-2';
+        item.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i><span>${t.text} （${t.author}）</span>`;
+        list.appendChild(item);
+      });
+      document.getElementById('certificate-modal').classList.remove('hidden');
+    }
+    function closeCertificateModal() {
+      playSound('click');
+      document.getElementById('certificate-modal').classList.add('hidden');
+    }
+
+    /* ========================================================================= */
+    /* MODULE 3: CURRICULUM FILTER                                               */
+    /* ========================================================================= */
+    function filterCurriculum(cat) {
+      playSound('click');
+      ['all', 'life', 'social', 'aac', 'strategy'].forEach(c => {
+        const btn = document.getElementById(`cur-filter-${c}`);
+        btn.className = (c === cat)
+          ? 'cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-indigo-600 text-white shadow-xs'
+          : 'cur-filter-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+
+      const items = {
+        life: document.querySelectorAll('.cur-item-life'),
+        social: document.querySelectorAll('.cur-item-social'),
+        aac: document.querySelectorAll('.cur-item-aac'),
+        strategy: document.querySelectorAll('.cur-item-strategy')
+      };
+
+      if (cat === 'all') {
+        Object.values(items).forEach(nodeList => nodeList.forEach(el => el.classList.remove('hidden')));
+      } else {
+        Object.entries(items).forEach(([key, nodeList]) => {
+          nodeList.forEach(el => el.classList.toggle('hidden', key !== cat));
+        });
+      }
+    }
+
+    /* Initialize on window load */
     window.addEventListener('DOMContentLoaded', () => {
       renderTraitCards();
       renderCovenantTags();
